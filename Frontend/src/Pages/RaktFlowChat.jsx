@@ -8,8 +8,9 @@ const RaktFlowChat = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [activeTab, setActiveTab] = useState('people');
   const [message, setMessage] = useState('');
-  const [messages, setMessages] = useState([]);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [chatHistories, setChatHistories] = useState({});
 
   useEffect(() => {
     const handleResize = () => {
@@ -34,28 +35,50 @@ const RaktFlowChat = () => {
     { id: 104, name: 'MediBot', avatar: '', description: 'Healthcare assistant', category: 'Health' },
   ];
 
+  // Filter contacts based on search query
+  const filteredPeople = people.filter(person =>
+    person.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const filteredBots = bots.filter(bot =>
+    bot.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    bot.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    bot.category.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   const handleSendMessage = () => {
-    if (message.trim() === '') return;
+    if (message.trim() === '' || !selectedUser) return;
     
     const newMessage = {
-      id: messages.length + 1,
+      id: Date.now(),
       text: message,
       sender: 'me',
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
     
-    setMessages([...messages, newMessage]);
+    // Update chat history for the selected user
+    setChatHistories(prev => ({
+      ...prev,
+      [selectedUser.id]: [...(prev[selectedUser.id] || []), newMessage]
+    }));
+    
     setMessage('');
     
     // Simulate reply after 1 second
     setTimeout(() => {
       const reply = {
-        id: messages.length + 2,
-        text: `This is a simulated reply from ${selectedUser.name}`,
+        id: Date.now() + 1,
+        text: selectedUser.isBot 
+          ? `This is an automated reply from ${selectedUser.name}. How can I assist you further?`
+          : `This is a simulated reply from ${selectedUser.name}`,
         sender: 'them',
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
-      setMessages(prev => [...prev, reply]);
+      
+      setChatHistories(prev => ({
+        ...prev,
+        [selectedUser.id]: [...(prev[selectedUser.id] || []), reply]
+      }));
     }, 1000);
   };
 
@@ -64,6 +87,19 @@ const RaktFlowChat = () => {
       handleSendMessage();
     }
   };
+
+  const handleUserSelect = (user) => {
+    setSelectedUser(user);
+    // Initialize empty chat if doesn't exist
+    if (!chatHistories[user.id]) {
+      setChatHistories(prev => ({
+        ...prev,
+        [user.id]: []
+      }));
+    }
+  };
+
+  const currentMessages = selectedUser ? chatHistories[selectedUser.id] || [] : [];
 
   return (
     <div className="flex h-screen bg-gray-950 text-gray-200 overflow-hidden">
@@ -89,6 +125,8 @@ const RaktFlowChat = () => {
             </div>
             <input
               type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search or start new chat"
               className="w-full pl-10 pr-4 py-2 bg-gray-800 rounded-lg text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-red-500"
             />
@@ -114,50 +152,62 @@ const RaktFlowChat = () => {
         {/* Chat List */}
         <div className="flex-1 overflow-y-auto">
           {activeTab === 'people' ? (
-            people.map(person => (
-              <motion.div
-                key={person.id}
-                whileHover={{ backgroundColor: 'rgba(55, 65, 81, 0.5)' }}
-                className={`flex items-center p-3 border-b border-gray-800 cursor-pointer ${selectedUser?.id === person.id ? 'bg-gray-800' : ''}`}
-                onClick={() => setSelectedUser(person)}
-              >
-                <div className="relative">
-                  <img src={person.avatar} alt={person.name} className="w-12 h-12 rounded-full object-cover" />
-                  {person.unread > 0 && (
-                    <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                      {person.unread}
+            filteredPeople.length > 0 ? (
+              filteredPeople.map(person => (
+                <motion.div
+                  key={person.id}
+                  whileHover={{ backgroundColor: 'rgba(55, 65, 81, 0.5)' }}
+                  className={`flex items-center p-3 border-b border-gray-800 cursor-pointer ${selectedUser?.id === person.id ? 'bg-gray-800' : ''}`}
+                  onClick={() => handleUserSelect(person)}
+                >
+                  <div className="relative">
+                    <img src={person.avatar} alt={person.name} className="w-12 h-12 rounded-full object-cover" />
+                    {person.unread > 0 && (
+                      <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                        {person.unread}
+                      </div>
+                    )}
+                  </div>
+                  <div className="ml-3 flex-1">
+                    <div className="flex justify-between items-center">
+                      <h3 className="font-medium">{person.name}</h3>
+                      <span className="text-xs text-gray-500">{person.time}</span>
                     </div>
-                  )}
-                </div>
-                <div className="ml-3 flex-1">
-                  <div className="flex justify-between items-center">
-                    <h3 className="font-medium">{person.name}</h3>
-                    <span className="text-xs text-gray-500">{person.time}</span>
+                    <p className="text-sm text-gray-400 truncate">{person.lastMessage}</p>
                   </div>
-                  <p className="text-sm text-gray-400 truncate">{person.lastMessage}</p>
-                </div>
-              </motion.div>
-            ))
+                </motion.div>
+              ))
+            ) : (
+              <div className="p-4 text-center text-gray-500">
+                No matching people found
+              </div>
+            )
           ) : (
-            bots.map(bot => (
-              <motion.div
-                key={bot.id}
-                whileHover={{ backgroundColor: 'rgba(55, 65, 81, 0.5)' }}
-                className={`flex items-center p-3 border-b border-gray-800 cursor-pointer ${selectedUser?.id === bot.id ? 'bg-gray-800' : ''}`}
-                onClick={() => setSelectedUser({...bot, isBot: true})}
-              >
-                <div className="w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center">
-                  <BsRobot className="text-2xl text-red-500" />
-                </div>
-                <div className="ml-3 flex-1">
-                  <div className="flex justify-between items-center">
-                    <h3 className="font-medium">{bot.name}</h3>
-                    <span className="text-xs px-2 py-1 bg-gray-800 rounded-full text-gray-400">{bot.category}</span>
+            filteredBots.length > 0 ? (
+              filteredBots.map(bot => (
+                <motion.div
+                  key={bot.id}
+                  whileHover={{ backgroundColor: 'rgba(55, 65, 81, 0.5)' }}
+                  className={`flex items-center p-3 border-b border-gray-800 cursor-pointer ${selectedUser?.id === bot.id ? 'bg-gray-800' : ''}`}
+                  onClick={() => handleUserSelect({...bot, isBot: true})}
+                >
+                  <div className="w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center">
+                    <BsRobot className="text-2xl text-red-500" />
                   </div>
-                  <p className="text-sm text-gray-400">{bot.description}</p>
-                </div>
-              </motion.div>
-            ))
+                  <div className="ml-3 flex-1">
+                    <div className="flex justify-between items-center">
+                      <h3 className="font-medium">{bot.name}</h3>
+                      <span className="text-xs px-2 py-1 bg-gray-800 rounded-full text-gray-400">{bot.category}</span>
+                    </div>
+                    <p className="text-sm text-gray-400">{bot.description}</p>
+                  </div>
+                </motion.div>
+              ))
+            ) : (
+              <div className="p-4 text-center text-gray-500">
+                No matching bots found
+              </div>
+            )
           )}
         </div>
       </div>
@@ -203,13 +253,13 @@ const RaktFlowChat = () => {
 
             {/* Messages */}
             <div className="flex-1 p-4 overflow-y-auto bg-gray-950 bg-opacity-50" style={{ backgroundImage: "url('https://transparenttextures.com/patterns/dark-mosaic.png')" }}>
-              {messages.length === 0 ? (
+              {currentMessages.length === 0 ? (
                 <div className="h-full flex flex-col items-center justify-center text-center text-gray-500">
                   <p>No messages yet</p>
                   <p className="text-sm mt-1">Start the conversation with {selectedUser.name}</p>
                 </div>
               ) : (
-                messages.map(msg => (
+                currentMessages.map(msg => (
                   <motion.div
                     key={msg.id}
                     initial={{ opacity: 0, y: 10 }}
@@ -263,13 +313,13 @@ const RaktFlowChat = () => {
           <div className="h-full flex flex-col items-center justify-center p-6 text-center">
             <div className="mb-6">
               <h1 className="text-4xl font-bold text-red-500 mb-2">RaktFlow</h1>
-              <p className="text-gray-400">Real-time chat application</p>
+              <p className="text-gray-200">Real-time chat application</p>
             </div>
             <div className="max-w-md">
               <img 
-                src="https://illustrations.popsy.co/amber/digital-nomad.svg" 
+                src="https://illustrations.popsy.co/red/video-call.svg" 
                 alt="Chat Illustration" 
-                className="w-full h-auto opacity-80"
+                className="w-full h-auto"
               />
             </div>
             <p className="mt-6 text-gray-500 max-w-md">
