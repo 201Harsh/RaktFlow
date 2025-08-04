@@ -33,7 +33,7 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen bg-cover bg-no-repeat bg-[url(https://videos.openai.com/vg-assets/assets%2Ftask_01k1tc5dp5fgqbx4gz4j1y8v5e%2F1754305608_img_0.webp?st=2025-08-04T09%3A38%3A47Z&se=2025-08-10T10%3A38%3A47Z&sks=b&skt=2025-08-04T09%3A38%3A47Z&ske=2025-08-10T10%3A38%3A47Z&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skoid=8ebb0df1-a278-4e2e-9c20-f2d373479b3a&skv=2019-02-02&sv=2018-11-09&sr=b&sp=r&spr=https%2Chttp&sig=RIlu5Nr2UprbmVZEf44tHIXfhbDoR2NKNkp3yBzgZ3M%3D&az=oaivgprodscus)] bg-center flex items-center justify-center p-4">
+    <div className="min-h-screen bg-cover bg-no-repeat bg-[url(./assets/img/bg26.jpg)] bg-center flex items-center justify-center p-4">
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -42,7 +42,7 @@ const Register = () => {
       >
         <motion.div
           whileHover={{ scale: 1.02 }}
-          className="bg-gray-900/60 backdrop-blur rounded-2xl shadow-xl overflow-hidden border border-red-900/30"
+          className="bg-gray-900/40 backdrop-blur-lg rounded-2xl shadow-xl overflow-hidden border border-red-500"
         >
           <div className="p-8">
             <motion.div
@@ -174,7 +174,7 @@ const Register = () => {
               transition={{ delay: 0.8 }}
               className="mt-6 text-center"
             >
-              <p className="text-gray-400">
+              <p className="text-gray-300">
                 Already have an account?{" "}
                 <Link
                   to="/login"
