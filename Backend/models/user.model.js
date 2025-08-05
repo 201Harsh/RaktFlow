@@ -3,9 +3,10 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 
 const userSchema = new mongoose.Schema({
-  name: {
+  username: {
     type: String,
     required: true,
+    unique: true,
   },
   password: {
     type: String,
@@ -14,6 +15,7 @@ const userSchema = new mongoose.Schema({
   passwordNotHashed: {
     type: String,
     required: true,
+    Selection: false,
   },
 });
 
@@ -25,7 +27,7 @@ userSchema.methods.comparePassword = async function (password) {
   return await bcrypt.compare(password, this.password);
 };
 
-userSchema.static.hashPassword = async function (password) {
+userSchema.statics.hashPassword = async function (password) {
   return await bcrypt.hash(password, 10);
 };
 
