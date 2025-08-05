@@ -13,7 +13,6 @@ import { Link } from "react-router-dom";
 const Register = () => {
   const [formData, setFormData] = useState({
     username: "",
-    email: "",
     password: "",
   });
   const [showPassword, setShowPassword] = useState(false);
@@ -83,35 +82,6 @@ const Register = () => {
                     onChange={handleChange}
                     className="w-full pl-10 pr-3 py-2 bg-gray-800/70 border border-gray-700 rounded-lg text-gray-100 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
                     placeholder="Enter your username"
-                    required
-                  />
-                </div>
-              </motion.div>
-
-              <motion.div
-                initial={{ x: -20, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                transition={{ delay: 0.4 }}
-                className="mb-4"
-              >
-                <label
-                  className="block text-gray-200 text-sm font-medium mb-2"
-                  htmlFor="email"
-                >
-                  Email
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <FaEnvelope className="text-red-500/80" />
-                  </div>
-                  <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    className="w-full pl-10 pr-3 py-2 bg-gray-800/70 border border-gray-700 rounded-lg text-gray-1s00 placeholder-gray-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                    placeholder="Enter your email"
                     required
                   />
                 </div>
