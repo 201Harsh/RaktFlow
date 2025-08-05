@@ -1,27 +1,62 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { FaUser, FaLock, FaSignInAlt, FaEye, FaEyeSlash } from 'react-icons/fa';
-import { Link } from 'react-router-dom';
+import React, { useState } from "react";
+import { motion } from "framer-motion";
+import { FaUser, FaLock, FaSignInAlt, FaEye, FaEyeSlash } from "react-icons/fa";
+import { Link, useNavigate } from "react-router-dom";
+import { Bounce, toast } from "react-toastify";
+import AxiosInstance from "../Config/Axios";
 
 const Login = () => {
   const [formData, setFormData] = useState({
-    username: '',
-    password: ''
+    username: "",
+    password: "",
   });
   const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
-  const handleSubmit = (e) => {
+  const Navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle login logic here
-    console.log(formData);
+
+    try {
+      const response = await AxiosInstance.post("/users/login", formData);
+
+      if (response.status === 200) {
+        toast.success(response.data.message, {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+          transition: Bounce,
+        });
+        localStorage.setItem("token", response.data.token);
+        localStorage.setItem("username", response.data.User.username);
+        Navigate("/chat");
+      }
+    } catch (error) {
+      toast.error(error.response.data.message, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+        transition: Bounce,
+      });
+    }
   };
 
   return (
@@ -33,7 +68,6 @@ const Login = () => {
         className="w-full max-w-md"
       >
         <motion.div
-          whileHover={{ scale: 1.02 }}
           className="bg-gray-900/40 backdrop-blur-lg rounded-2xl shadow-xl overflow-hidden border border-red-500"
         >
           <div className="p-8">
@@ -54,7 +88,10 @@ const Login = () => {
                 transition={{ delay: 0.3 }}
                 className="mb-4"
               >
-                <label className="block text-gray-200 text-sm font-medium mb-2" htmlFor="username">
+                <label
+                  className="block text-gray-200 text-sm font-medium mb-2"
+                  htmlFor="username"
+                >
                   Username
                 </label>
                 <div className="relative">
@@ -81,7 +118,10 @@ const Login = () => {
                 transition={{ delay: 0.4 }}
                 className="mb-6"
               >
-                <label className="block text-gray-200 text-sm font-medium mb-2" htmlFor="password">
+                <label
+                  className="block text-gray-200 text-sm font-medium mb-2"
+                  htmlFor="password"
+                >
                   Password
                 </label>
                 <div className="relative">
@@ -113,7 +153,6 @@ const Login = () => {
               </motion.div>
 
               <motion.button
-                whileHover={{ scale: 1.03, backgroundColor: "#ef4444" }}
                 whileTap={{ scale: 0.98 }}
                 type="submit"
                 className="w-full bg-red-600 text-white font-medium py-2 px-4 rounded-lg transition duration-300 flex items-center justify-center space-x-2 shadow-lg shadow-red-900/30 mb-4"
@@ -123,8 +162,8 @@ const Login = () => {
               </motion.button>
 
               <div className="text-right mb-6">
-                <Link 
-                  to="/forgot-password" 
+                <Link
+                  to="/forgot-password"
                   className="text-sm text-gray-400 hover:text-red-500 hover:underline"
                 >
                   Forgot password?
@@ -139,8 +178,11 @@ const Login = () => {
               className="mt-6 text-center"
             >
               <p className="text-gray-300">
-                Don't have an account?{' '}
-                <Link to="/" className="text-red-500 font-medium hover:underline">
+                Don't have an account?{" "}
+                <Link
+                  to="/"
+                  className="text-red-500 font-medium hover:underline"
+                >
                   Register here
                 </Link>
               </p>
