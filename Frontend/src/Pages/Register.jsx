@@ -7,6 +7,8 @@ import {
   FaEye,
   FaEyeSlash,
   FaSignInAlt,
+  FaCheck,
+  FaSpinner,
 } from "react-icons/fa";
 import { Link } from "react-router-dom";
 
@@ -16,6 +18,9 @@ const Register = () => {
     password: "",
   });
   const [showPassword, setShowPassword] = useState(false);
+  const [agreeToTerms, setAgreeToTerms] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isVerified, setIsVerified] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -25,10 +30,28 @@ const Register = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle registration logic here
-    console.log(formData);
+    
+    if (!agreeToTerms) {
+      alert("Please agree to the terms and conditions");
+      return;
+    }
+
+    setIsSubmitting(true);
+    
+    // Simulate verification process
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    setIsVerified(true);
+    
+    // Simulate successful registration
+    setTimeout(() => {
+      console.log(formData);
+      setIsSubmitting(false);
+      setIsVerified(false);
+      // Handle actual registration logic here
+    }, 1000);
   };
 
   return (
@@ -127,14 +150,58 @@ const Register = () => {
                 </div>
               </motion.div>
 
-              <motion.button
-                whileHover={{ scale: 1.03, backgroundColor: "#ef4444" }}
-                whileTap={{ scale: 0.98 }}
-                type="submit"
-                className="w-full bg-red-600 text-white font-medium py-2 px-4 rounded-lg transition duration-300 flex items-center justify-center space-x-2 shadow-lg shadow-red-900/30"
+              <motion.div
+                initial={{ x: -20, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ delay: 0.6 }}
+                className="mb-4 flex items-center"
               >
-                <FaSignInAlt />
-                <span>Register</span>
+                <input
+                  id="terms-checkbox"
+                  type="checkbox"
+                  checked={agreeToTerms}
+                  onChange={(e) => setAgreeToTerms(e.target.checked)}
+                  className="w-4 h-4 text-red-600 bg-gray-800 border-gray-600 rounded focus:ring-red-500 focus:ring-2"
+                />
+                <label
+                  htmlFor="terms-checkbox"
+                  className="ml-2 text-sm text-gray-200"
+                >
+                  I agree to all terms and conditions of RaktFlow
+                </label>
+              </motion.div>
+
+              <motion.button
+                whileHover={!isSubmitting ? { scale: 1.03, backgroundColor: "#ef4444" } : {}}
+                whileTap={!isSubmitting ? { scale: 0.98 } : {}}
+                type="submit"
+                disabled={isSubmitting}
+                className={`w-full ${
+                  isVerified ? "bg-green-600" : "bg-red-600"
+                } text-white font-medium py-2 px-4 rounded-lg transition duration-300 flex items-center justify-center space-x-2 shadow-lg ${
+                  isVerified ? "shadow-green-900/30" : "shadow-red-900/30"
+                }`}
+              >
+                {isSubmitting ? (
+                  <>
+                    {isVerified ? (
+                      <FaCheck className="animate-bounce" />
+                    ) : (
+                      <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                      >
+                        <FaSpinner />
+                      </motion.div>
+                    )}
+                    <span>{isVerified ? "Verified!" : "Verifying..."}</span>
+                  </>
+                ) : (
+                  <>
+                    <FaSignInAlt />
+                    <span>Register</span>
+                  </>
+                )}
               </motion.button>
             </form>
 
