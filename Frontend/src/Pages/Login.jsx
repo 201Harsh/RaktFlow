@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { FaUser, FaLock, FaSignInAlt, FaEye, FaEyeSlash } from "react-icons/fa";
+import { FaUser, FaLock, FaSignInAlt, FaEye, FaEyeSlash, FaTint } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { Bounce, toast } from "react-toastify";
 import AxiosInstance from "../Config/Axios";
@@ -67,9 +67,7 @@ const Login = () => {
         transition={{ duration: 0.5 }}
         className="w-full max-w-md"
       >
-        <motion.div
-          className="bg-gray-900/40 backdrop-blur-lg rounded-2xl shadow-xl overflow-hidden border border-red-500"
-        >
+        <motion.div className="bg-gray-900/40 backdrop-blur-lg rounded-2xl shadow-xl overflow-hidden border border-red-500">
           <div className="p-8">
             <motion.div
               initial={{ scale: 0.9 }}
@@ -77,7 +75,10 @@ const Login = () => {
               transition={{ delay: 0.2 }}
               className="text-center mb-8"
             >
-              <h1 className="text-3xl font-bold text-red-500 mb-2">RaktFlow</h1>
+              <div className="flex items-center justify-center mb-2">
+                <FaTint className="text-red-600 text-3xl mr-2" />
+                <h1 className="text-3xl font-bold text-red-500">RaktFlow</h1>
+              </div>
               <p className="text-gray-200">Welcome back to your chat</p>
             </motion.div>
 
@@ -160,15 +161,6 @@ const Login = () => {
                 <FaSignInAlt />
                 <span>Login</span>
               </motion.button>
-
-              <div className="text-right mb-6">
-                <Link
-                  to="/forgot-password"
-                  className="text-sm text-gray-400 hover:text-red-500 hover:underline"
-                >
-                  Forgot password?
-                </Link>
-              </div>
             </form>
 
             <motion.div

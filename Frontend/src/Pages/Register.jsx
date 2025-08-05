@@ -9,6 +9,7 @@ import {
   FaSignInAlt,
   FaCheck,
   FaSpinner,
+  FaTint,
 } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import AxiosInstance from "../Config/Axios";
@@ -61,11 +62,10 @@ const Register = () => {
 
         setIsSubmitting(false);
         setIsVerified(true);
-        
+
         localStorage.setItem("token", response.data.token);
         localStorage.setItem("username", response.data.User.username);
         Navigate("/chat");
-
       }
     } catch (error) {
       toast.error(error.response.data.message, {
@@ -104,9 +104,7 @@ const Register = () => {
         transition={{ duration: 0.5 }}
         className="w-full max-w-md"
       >
-        <motion.div
-          className="bg-gray-900/40 backdrop-blur-lg rounded-2xl shadow-xl overflow-hidden border border-red-500"
-        >
+        <motion.div className="bg-gray-900/40 backdrop-blur-lg rounded-2xl shadow-xl overflow-hidden border border-red-500">
           <div className="p-8">
             <motion.div
               initial={{ scale: 0.9 }}
@@ -114,7 +112,10 @@ const Register = () => {
               transition={{ delay: 0.2 }}
               className="text-center mb-8"
             >
-              <h1 className="text-3xl font-bold text-red-500 mb-2">RaktFlow</h1>
+              <div className="flex items-center justify-center mb-2">
+                <FaTint className="text-red-600 text-3xl mr-2" />
+                <h1 className="text-3xl font-bold text-red-500">RaktFlow</h1>
+              </div>
               <p className="text-gray-200">
                 Create your account to start chatting
               </p>
