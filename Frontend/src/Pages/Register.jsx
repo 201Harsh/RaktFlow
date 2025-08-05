@@ -32,19 +32,19 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!agreeToTerms) {
-      alert("Please agree to the terms and conditions");
+      alert("Please agree to the terms and conditions of RaktFlow.");
       return;
     }
 
     setIsSubmitting(true);
-    
+
     // Simulate verification process
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+
     setIsVerified(true);
-    
+
     // Simulate successful registration
     setTimeout(() => {
       console.log(formData);
@@ -159,6 +159,7 @@ const Register = () => {
                 <input
                   id="terms-checkbox"
                   type="checkbox"
+                  required
                   checked={agreeToTerms}
                   onChange={(e) => setAgreeToTerms(e.target.checked)}
                   className="w-4 h-4 text-red-600 bg-gray-800 border-gray-600 rounded focus:ring-red-500 focus:ring-2"
@@ -172,7 +173,6 @@ const Register = () => {
               </motion.div>
 
               <motion.button
-                whileHover={!isSubmitting ? { scale: 1.03, backgroundColor: "#ef4444" } : {}}
                 whileTap={!isSubmitting ? { scale: 0.98 } : {}}
                 type="submit"
                 disabled={isSubmitting}
@@ -189,7 +189,11 @@ const Register = () => {
                     ) : (
                       <motion.div
                         animate={{ rotate: 360 }}
-                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                        transition={{
+                          duration: 1,
+                          repeat: Infinity,
+                          ease: "linear",
+                        }}
                       >
                         <FaSpinner />
                       </motion.div>
