@@ -149,6 +149,55 @@ const RaktFlowChat = () => {
     }, 1000);
   };
 
+  const handleImageUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 10 * 1024 * 1024) {
+        alert("Please select an image smaller than 10MB");
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const newMessage = {
+          id: Date.now(),
+          image: event.target.result,
+          sender: "me",
+          time: new Date().toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+        };
+
+        setChatHistories((prev) => ({
+          ...prev,
+          [selectedUser.id]: [...(prev[selectedUser.id] || []), newMessage],
+        }));
+
+        // Simulate reply after 1 second
+        setTimeout(() => {
+          const reply = {
+            id: Date.now() + 1,
+            text: selectedUser.isBot
+              ? `Nice image! This is an automated reply from ${selectedUser.name}.`
+              : `This is a simulated reply to your image from ${selectedUser.name}`,
+            sender: "them",
+            time: new Date().toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            }),
+          };
+
+          setChatHistories((prev) => ({
+            ...prev,
+            [selectedUser.id]: [...(prev[selectedUser.id] || []), reply],
+          }));
+        }, 1000);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
       handleSendMessage();
@@ -174,7 +223,7 @@ const RaktFlowChat = () => {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [currentMessages]);
-  
+
   return (
     <div className="flex h-screen bg-gray-950 text-gray-200 overflow-hidden">
       {/* Sidebar */}
@@ -387,7 +436,17 @@ const RaktFlowChat = () => {
                             : "bg-gray-900/90 border border-gray-700/50 rounded-tl-none"
                         }`}
                       >
-                        <p className="text-gray-100">{msg.text}</p>
+                        {msg.image ? (
+                          <div className="mb-2">
+                            <img 
+                              src={msg.image} 
+                              alt="Uploaded content" 
+                              className="max-h-64 rounded-lg object-contain"
+                            />
+                          </div>
+                        ) : (
+                          <p className="text-gray-100">{msg.text}</p>
+                        )}
                         <p
                           className={`text-xs mt-1 text-right ${
                             msg.sender === "me"
@@ -408,12 +467,37 @@ const RaktFlowChat = () => {
             {/* Message Input */}
             <div className="p-3 border-t border-gray-800 bg-gray-900/50 backdrop-blur-sm">
               <div className="flex items-center">
-                <button className="p-2 text-gray-400 hover:text-red-500">
-                  <FaPaperclip />
-                </button>
-                <button className="p-2 text-gray-400 hover:text-red-500">
+                {/* File upload button - hidden input with button trigger */}
+                <div className="relative">
+                  <button
+                    className="p-2 text-gray-400 hover:text-red-500"
+                    onClick={() =>
+                      document.getElementById("file-upload").click()
+                    }
+                  >
+                    <FaPaperclip />
+                  </button>
+                  <input
+                    id="file-upload"
+                    type="file"
+                    accept="image/jpeg,image/png,image/gif,image/webp"
+                    className="hidden"
+                    onChange={handleImageUpload}
+                  />
+                </div>
+
+                {/* Smile button */}
+                <button
+                  className="p-2 text-gray-400 hover:text-red-500"
+                  onClick={() => {
+                    console.log(
+                      "Smile button clicked - implement emoji picker"
+                    );
+                  }}
+                >
                   <FaSmile />
                 </button>
+
                 <input
                   type="text"
                   value={message}
