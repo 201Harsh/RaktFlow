@@ -336,7 +336,7 @@ const RaktFlowChat = () => {
                 )}
                 <div className="ml-3">
                   <h3 className="font-medium">{selectedUser.name}</h3>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-green-400">
                     {selectedUser.isBot ? "AI Assistant" : "Online"}
                   </p>
                 </div>
@@ -352,16 +352,8 @@ const RaktFlowChat = () => {
             </div>
 
             {/* Messages */}
-            <div
-              className="flex-1 overflow-y-auto"
-              style={{
-                backgroundImage: "url('../src/assets/img/bg6.jpg')",
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-                backgroundAttachment: "fixed",
-              }}
-            >
-              <div className="h-full w-full backdrop-blur-sm bg-gray-950/30 p-4 rounded-lg">
+            <div className="flex-1 overflow-y-auto bg-[url(./assets/img/bg23.jpg)] bg-cover bg-no-repeat bg-center">
+              <div className="min-h-full w-full backdrop-blur-sm bg-gray-950/30 p-4 rounded-lg">
                 {currentMessages.length === 0 ? (
                   <div className="h-full flex flex-col items-center justify-center text-center text-gray-300">
                     <div className="backdrop-blur-xl bg-gray-900/80 p-6 rounded-xl border border-red-900/30">
@@ -383,10 +375,10 @@ const RaktFlowChat = () => {
                       }`}
                     >
                       <div
-                        className={`max-w-xs md:max-w-md lg:max-w-lg rounded-lg px-4 py-2 backdrop-blur-md ${
+                        className={`max-w-xs md:max-w-md lg:max-w-lg rounded-lg px-4 py-2 backdrop-blur-xl ${
                           msg.sender === "me"
                             ? "bg-red-600/90 border border-red-700/50 rounded-tr-none"
-                            : "bg-gray-800/90 border border-gray-700/50 rounded-tl-none"
+                            : "bg-gray-900/90 border border-gray-700/50 rounded-tl-none"
                         }`}
                       >
                         <p className="text-gray-100">{msg.text}</p>
