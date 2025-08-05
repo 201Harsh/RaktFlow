@@ -11,6 +11,7 @@ import {
   FaSpinner,
 } from "react-icons/fa";
 import { Link } from "react-router-dom";
+import AxiosInstance from "../Config/Axios";
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -38,12 +39,19 @@ const Register = () => {
       return;
     }
 
+    const response = await AxiosInstance.post("/users/register", formData);
+    console.log(response)
+
     setIsSubmitting(true);
+
+
 
     // Simulate verification process
     await new Promise((resolve) => setTimeout(resolve, 2000));
 
     setIsVerified(true);
+
+
 
     // Simulate successful registration
     setTimeout(() => {
