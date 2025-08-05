@@ -89,3 +89,24 @@ module.exports.LoginUser = async (req, res) => {
     });
   }
 };
+
+module.exports.GetAllUsers = async (req, res) => {
+  try {
+    const users = await userModel.find();
+
+    if (!users) {
+      return res.status(400).json({
+        message: "No users found",
+      });
+    }
+
+    res.status(200).json({
+      message: "Users fetched successfully",
+      users,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
