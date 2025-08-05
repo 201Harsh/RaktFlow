@@ -2,11 +2,12 @@ const jwt = require("jsonwebtoken");
 
 module.exports.authUser = async (req, res, next) => {
   try {
+    console.log("Cookies received:", req.cookies);
     const token =
-      req.cookies?.token || req.headers?.authorization?.split(" ")[1];
+      req.cookies?.token || req.headers.authorization?.split(" ")[1];
     if (!token) {
       return res.status(401).json({
-        message: "Unauthorized Access",
+        message: "Authorization token not found!!",
       });
     }
     const decoded = jwt.verify(token, process.env.JWT_SECRET);

@@ -23,4 +23,6 @@ router.post(
 
 router.get("/all", userController.GetAllUsers);
 
+router.get("/profile", userMiddleware.authUser, userController.getOneUser);
+
 module.exports = router;
