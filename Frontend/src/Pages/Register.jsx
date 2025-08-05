@@ -105,7 +105,6 @@ const Register = () => {
         className="w-full max-w-md"
       >
         <motion.div
-          whileHover={{ scale: 1.02 }}
           className="bg-gray-900/40 backdrop-blur-lg rounded-2xl shadow-xl overflow-hidden border border-red-500"
         >
           <div className="p-8">
