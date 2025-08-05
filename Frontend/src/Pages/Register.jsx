@@ -10,8 +10,9 @@ import {
   FaCheck,
   FaSpinner,
 } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import AxiosInstance from "../Config/Axios";
+import { toast, Bounce } from "react-toastify";
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -31,6 +32,8 @@ const Register = () => {
     }));
   };
 
+  const Navigate = useNavigate();
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -39,27 +42,58 @@ const Register = () => {
       return;
     }
 
-    const response = await AxiosInstance.post("/users/register", formData);
-    console.log(response)
+    try {
+      setIsSubmitting(true);
+      const response = await AxiosInstance.post("/users/register", formData);
 
-    setIsSubmitting(true);
+      if (response.status === 200) {
+        toast.success(response.data.message, {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+          transition: Bounce,
+        });
 
+        setIsSubmitting(false);
+        setIsVerified(true);
+        
+        localStorage.setItem("token", response.data.token);
+        localStorage.setItem("username", response.data.User.username);
+        Navigate("/chat");
 
-
-    // Simulate verification process
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-
-    setIsVerified(true);
-
-
-
-    // Simulate successful registration
-    setTimeout(() => {
-      console.log(formData);
+      }
+    } catch (error) {
+      toast.error(error.response.data.message, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+        transition: Bounce,
+      });
       setIsSubmitting(false);
       setIsVerified(false);
-      // Handle actual registration logic here
-    }, 1000);
+    }
+
+    // Simulate verification process
+    // await new Promise((resolve) => setTimeout(resolve, 2000));
+
+    // setIsVerified(true);
+
+    // // Simulate successful registration
+    // setTimeout(() => {
+    //   setIsSubmitting(false);
+    //   setIsVerified(false);
+    //   // Handle actual registration logic here
+    // }, 1000);
   };
 
   return (
