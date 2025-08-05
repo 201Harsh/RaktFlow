@@ -1,15 +1,17 @@
 import React, { useState, useEffect, useRef } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   FaSearch,
   FaEllipsisV,
   FaPaperclip,
   FaMicrophone,
   FaSmile,
-  FaChevronDown,
+  FaChevronLeft,
+  FaTimes,
 } from "react-icons/fa";
 import { IoMdSend } from "react-icons/io";
-import { BsRobot } from "react-icons/bs";
+import { BsRobot, BsThreeDotsVertical } from "react-icons/bs";
+import { IoSend } from "react-icons/io5";
 
 const RaktFlowChat = () => {
   const [selectedUser, setSelectedUser] = useState(null);
@@ -18,8 +20,11 @@ const RaktFlowChat = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [searchQuery, setSearchQuery] = useState("");
   const [chatHistories, setChatHistories] = useState({});
-  const messagesEndRef = React.useRef(null);
+  const [showSearch, setShowSearch] = useState(false);
+  const messagesEndRef = useRef(null);
+  const inputRef = useRef(null);
 
+  // Detect mobile/desktop
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 768);
@@ -37,6 +42,7 @@ const RaktFlowChat = () => {
       lastMessage: "Hey, how are you?",
       time: "10:30 AM",
       unread: 2,
+      status: "online",
     },
     {
       id: 2,
@@ -45,6 +51,7 @@ const RaktFlowChat = () => {
       lastMessage: "Meeting at 3 PM",
       time: "Yesterday",
       unread: 0,
+      status: "last seen today at 9:15 AM",
     },
     {
       id: 3,
@@ -53,6 +60,7 @@ const RaktFlowChat = () => {
       lastMessage: "Please review the docs",
       time: "Yesterday",
       unread: 5,
+      status: "online",
     },
     {
       id: 4,
@@ -61,6 +69,7 @@ const RaktFlowChat = () => {
       lastMessage: "Thanks for the help!",
       time: "Monday",
       unread: 0,
+      status: "last seen yesterday at 11:30 PM",
     },
   ];
 
@@ -95,7 +104,7 @@ const RaktFlowChat = () => {
     },
   ];
 
-  // Filter contacts based on search query
+  // Filter contacts
   const filteredPeople = people.filter((person) =>
     person.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -120,7 +129,6 @@ const RaktFlowChat = () => {
       }),
     };
 
-    // Update chat history for the selected user
     setChatHistories((prev) => ({
       ...prev,
       [selectedUser.id]: [...(prev[selectedUser.id] || []), newMessage],
@@ -128,7 +136,7 @@ const RaktFlowChat = () => {
 
     setMessage("");
 
-    // Simulate reply after 1 second
+    // Simulate reply
     setTimeout(() => {
       const reply = {
         id: Date.now() + 1,
@@ -174,7 +182,7 @@ const RaktFlowChat = () => {
           [selectedUser.id]: [...(prev[selectedUser.id] || []), newMessage],
         }));
 
-        // Simulate reply after 1 second
+        // Simulate reply
         setTimeout(() => {
           const reply = {
             id: Date.now() + 1,
@@ -199,30 +207,38 @@ const RaktFlowChat = () => {
   };
 
   const handleKeyPress = (e) => {
-    if (e.key === "Enter") {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
       handleSendMessage();
     }
   };
 
   const handleUserSelect = (user) => {
-    setSelectedUser(user);
-    // Initialize empty chat if doesn't exist
+    setSelectedUser({ ...user, isBot: activeTab === "bots" });
     if (!chatHistories[user.id]) {
       setChatHistories((prev) => ({
         ...prev,
         [user.id]: [],
       }));
     }
+    setShowSearch(false);
   };
 
   const currentMessages = selectedUser
     ? chatHistories[selectedUser.id] || []
     : [];
 
-  // Auto-scroll to bottom when messages change
+  // Auto-scroll to bottom
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [currentMessages]);
+
+  // Focus input when emoji picker closes
+
+  // Add emoji to message
+  const addEmoji = (emoji) => {
+    setMessage((prev) => prev + emoji.native);
+  };
 
   return (
     <div className="flex h-screen bg-gray-950 text-gray-200 overflow-hidden">
@@ -233,32 +249,49 @@ const RaktFlowChat = () => {
         } flex-col w-full md:w-1/3 lg:w-1/4 bg-gray-900 border-r border-gray-800`}
       >
         {/* Header */}
-        <div className="p-4 border-b border-gray-800 flex justify-between items-center bg-gray-900/50 backdrop-blur-sm">
+        <div className="p-3 border-b border-gray-800 flex justify-between items-center bg-gray-900/50 backdrop-blur-sm">
           <div className="flex items-center">
             <h1 className="text-xl font-bold text-red-500">RaktFlow</h1>
           </div>
           <div className="flex space-x-3 text-gray-400">
+            <button
+              className="hover:text-red-500"
+              onClick={() => setShowSearch(!showSearch)}
+            >
+              <FaSearch />
+            </button>
             <button className="hover:text-red-500">
-              <FaEllipsisV />
+              <BsThreeDotsVertical />
             </button>
           </div>
         </div>
 
-        {/* Search */}
-        <div className="p-3 border-b border-gray-800">
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <FaSearch className="text-gray-500" />
+        {/* Search - Expanded view */}
+        {showSearch && (
+          <div className="p-3 border-b border-gray-800 bg-gray-800">
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FaSearch className="text-gray-500" />
+              </div>
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search contacts"
+                className="w-full pl-10 pr-4 py-2 bg-gray-700 rounded-lg text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+                autoFocus
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-300"
+                >
+                  <FaTimes />
+                </button>
+              )}
             </div>
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search or start new chat"
-              className="w-full pl-10 pr-4 py-2 bg-gray-800 rounded-lg text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-red-500"
-            />
           </div>
-        </div>
+        )}
 
         {/* Tabs */}
         <div className="flex border-b border-gray-800">
@@ -292,6 +325,7 @@ const RaktFlowChat = () => {
                 <motion.div
                   key={person.id}
                   whileHover={{ backgroundColor: "rgba(55, 65, 81, 0.5)" }}
+                  whileTap={{ backgroundColor: "rgba(55, 65, 81, 0.7)" }}
                   className={`flex items-center p-3 border-b border-gray-800 cursor-pointer ${
                     selectedUser?.id === person.id ? "bg-gray-800" : ""
                   }`}
@@ -308,11 +342,14 @@ const RaktFlowChat = () => {
                         {person.unread}
                       </div>
                     )}
+                    {person.status === "online" && (
+                      <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-gray-900"></div>
+                    )}
                   </div>
-                  <div className="ml-3 flex-1">
+                  <div className="ml-3 flex-1 min-w-0">
                     <div className="flex justify-between items-center">
-                      <h3 className="font-medium">{person.name}</h3>
-                      <span className="text-xs text-gray-500">
+                      <h3 className="font-medium truncate">{person.name}</h3>
+                      <span className="text-xs text-gray-500 whitespace-nowrap ml-2">
                         {person.time}
                       </span>
                     </div>
@@ -332,22 +369,25 @@ const RaktFlowChat = () => {
               <motion.div
                 key={bot.id}
                 whileHover={{ backgroundColor: "rgba(55, 65, 81, 0.5)" }}
+                whileTap={{ backgroundColor: "rgba(55, 65, 81, 0.7)" }}
                 className={`flex items-center p-3 border-b border-gray-800 cursor-pointer ${
                   selectedUser?.id === bot.id ? "bg-gray-800" : ""
                 }`}
-                onClick={() => handleUserSelect({ ...bot, isBot: true })}
+                onClick={() => handleUserSelect(bot)}
               >
                 <div className="w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center">
                   <BsRobot className="text-2xl text-red-500" />
                 </div>
-                <div className="ml-3 flex-1">
+                <div className="ml-3 flex-1 min-w-0">
                   <div className="flex justify-between items-center">
-                    <h3 className="font-medium">{bot.name}</h3>
-                    <span className="text-xs px-2 py-1 bg-gray-800 rounded-full text-gray-400">
+                    <h3 className="font-medium truncate">{bot.name}</h3>
+                    <span className="text-xs px-2 py-1 bg-gray-800 rounded-full text-gray-400 whitespace-nowrap">
                       {bot.category}
                     </span>
                   </div>
-                  <p className="text-sm text-gray-400">{bot.description}</p>
+                  <p className="text-sm text-gray-400 truncate">
+                    {bot.description}
+                  </p>
                 </div>
               </motion.div>
             ))
@@ -363,19 +403,19 @@ const RaktFlowChat = () => {
       <div
         className={`${
           isMobile && !selectedUser ? "hidden" : "flex"
-        } flex-col flex-1 bg-gray-950`}
+        } flex-col flex-1 bg-gray-950 relative`}
       >
         {selectedUser ? (
           <>
             {/* Chat Header */}
-            <div className="p-3 border-b border-gray-800 flex justify-between items-center bg-gray-900/50 backdrop-blur-sm">
+            <div className="p-3 fixed w-full z-40 border-b border-gray-800 flex justify-between items-center bg-gray-900/80 backdrop-blur-xl">
               <div className="flex items-center">
                 {isMobile && (
                   <button
                     onClick={() => setSelectedUser(null)}
                     className="mr-2 text-gray-400 hover:text-red-500"
                   >
-                    <FaChevronDown className="transform rotate-90" />
+                    <FaChevronLeft className="text-xl" />
                   </button>
                 )}
                 {selectedUser.avatar ? (
@@ -391,8 +431,10 @@ const RaktFlowChat = () => {
                 )}
                 <div className="ml-3">
                   <h3 className="font-medium">{selectedUser.name}</h3>
-                  <p className="text-xs text-green-400">
-                    {selectedUser.isBot ? "AI Assistant" : "Online"}
+                  <p className="text-xs text-gray-400">
+                    {selectedUser.isBot
+                      ? "AI Assistant"
+                      : selectedUser.status || "Online"}
                   </p>
                 </div>
               </div>
@@ -401,73 +443,80 @@ const RaktFlowChat = () => {
                   <FaSearch />
                 </button>
                 <button className="hover:text-red-500">
-                  <FaEllipsisV />
+                  <BsThreeDotsVertical />
                 </button>
               </div>
             </div>
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto bg-[url(./assets/img/bg23.jpg)] bg-cover bg-no-repeat bg-center">
-              <div className="min-h-full w-full backdrop-blur-sm bg-gray-950/30 p-4 rounded-lg">
+            <div className="flex-1 overflow-y-auto bg-[url(./assets/img/bg22.jpg)] bg-cover bg-no-repeat bg-center">
+              <div className="min-h-full w-full px-2 sm:px-4 pt-16 pb-24 backdrop-blur-sm bg-gray-950/30 rounded-lg">
                 {currentMessages.length === 0 ? (
-                  <div className="h-full flex flex-col items-center justify-center text-center text-gray-300">
-                    <div className="backdrop-blur-xl bg-gray-900/80 p-6 rounded-xl border border-red-900/30">
+                  <div className="h-full flex flex-col items-center justify-center text-center text-gray-300 p-4">
+                    <div className="backdrop-blur-xl bg-gray-900/80 p-6 rounded-xl border border-red-900/30 max-w-md">
                       <p className="text-lg">No messages yet</p>
                       <p className="text-sm mt-2 text-gray-400">
-                        Start the conversation with{" "}
-                        {selectedUser?.name || "your contact"}
+                        Start the conversation with {selectedUser.name}
                       </p>
                     </div>
                   </div>
                 ) : (
-                  currentMessages.map((msg) => (
-                    <motion.div
-                      key={msg.id}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className={`flex mb-4 ${
-                        msg.sender === "me" ? "justify-end" : "justify-start"
-                      }`}
-                    >
-                      <div
-                        className={`max-w-xs md:max-w-md lg:max-w-lg rounded-lg px-4 py-2 backdrop-blur-xl ${
-                          msg.sender === "me"
-                            ? "bg-red-600/90 border border-red-700/50 rounded-tr-none"
-                            : "bg-gray-900/90 border border-gray-700/50 rounded-tl-none"
-                        }`}
-                      >
-                        {msg.image ? (
-                          <div className="mb-2">
-                            <img 
-                              src={msg.image} 
-                              alt="Uploaded content" 
-                              className="max-h-64 rounded-lg object-contain"
-                            />
-                          </div>
-                        ) : (
-                          <p className="text-gray-100">{msg.text}</p>
-                        )}
-                        <p
-                          className={`text-xs mt-1 text-right ${
+                  <div className="space-y-2 p-2">
+                    <AnimatePresence>
+                      {currentMessages.map((msg) => (
+                        <motion.div
+                          key={msg.id}
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.2 }}
+                          className={`flex ${
                             msg.sender === "me"
-                              ? "text-red-200/90"
-                              : "text-gray-400/90"
+                              ? "justify-end"
+                              : "justify-start"
                           }`}
                         >
-                          {msg.time}
-                        </p>
-                      </div>
-                    </motion.div>
-                  ))
+                          <div
+                            className={`max-w-[85%] sm:max-w-[75%] md:max-w-[65%] rounded-lg px-3 py-2 ${
+                              msg.sender === "me"
+                                ? "bg-red-600/90 border border-red-700/50 rounded-tr-none"
+                                : "bg-gray-800/90 border border-gray-700/50 rounded-tl-none"
+                            }`}
+                          >
+                            {msg.image ? (
+                              <div className="mb-1">
+                                <img
+                                  src={msg.image}
+                                  alt="Uploaded content"
+                                  className="max-h-64 rounded-lg object-contain"
+                                />
+                              </div>
+                            ) : (
+                              <p className="text-gray-100 break-words">
+                                {msg.text}
+                              </p>
+                            )}
+                            <p
+                              className={`text-[10px] mt-1 text-right ${
+                                msg.sender === "me"
+                                  ? "text-red-200/90"
+                                  : "text-gray-400/90"
+                              }`}
+                            >
+                              {msg.time}
+                            </p>
+                          </div>
+                        </motion.div>
+                      ))}
+                    </AnimatePresence>
+                    <div ref={messagesEndRef} />
+                  </div>
                 )}
-                <div ref={messagesEndRef} />
               </div>
             </div>
 
             {/* Message Input */}
-            <div className="p-3 border-t border-gray-800 bg-gray-900/50 backdrop-blur-sm">
+            <div className="p-3 fixed bottom-0 w-full z-50 border-t border-gray-800 bg-gray-900/80 backdrop-blur-sm">
               <div className="flex items-center">
-                {/* File upload button - hidden input with button trigger */}
                 <div className="relative">
                   <button
                     className="p-2 text-gray-400 hover:text-red-500"
@@ -475,49 +524,49 @@ const RaktFlowChat = () => {
                       document.getElementById("file-upload").click()
                     }
                   >
-                    <FaPaperclip />
+                    <FaPaperclip className="text-lg" />
                   </button>
                   <input
                     id="file-upload"
                     type="file"
-                    accept="image/jpeg,image/png,image/gif,image/webp"
+                    accept="image/*"
                     className="hidden"
                     onChange={handleImageUpload}
                   />
                 </div>
 
-                {/* Smile button */}
-                <button
-                  className="p-2 text-gray-400 hover:text-red-500"
-                  onClick={() => {
-                    console.log(
-                      "Smile button clicked - implement emoji picker"
-                    );
-                  }}
-                >
-                  <FaSmile />
+                <button className="p-2 text-gray-400 hover:text-red-500">
+                  <FaSmile className="text-lg" />
                 </button>
 
-                <input
-                  type="text"
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  placeholder="Type a message"
-                  className="flex-1 mx-2 py-2 px-4 bg-gray-800 rounded-full text-gray-200 focus:outline-none focus:ring-1 focus:ring-red-500"
-                />
-                {message ? (
-                  <button
-                    onClick={handleSendMessage}
-                    className="p-2 text-red-500 hover:text-red-400"
-                  >
-                    <IoMdSend className="text-xl" />
-                  </button>
-                ) : (
-                  <button className="p-2 text-gray-400 hover:text-red-500">
-                    <FaMicrophone />
-                  </button>
-                )}
+                <div className="flex-1 mx-2 relative">
+                  <textarea
+                    ref={inputRef}
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    onKeyDown={handleKeyPress}
+                    placeholder="Type a message"
+                    className="w-full py-2 px-4 bg-gray-800 rounded-full text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-red-500 resize-none max-h-32"
+                    rows="1"
+                    style={{ minHeight: "40px" }}
+                  />
+                </div>
+
+                <button
+                  onClick={handleSendMessage}
+                  disabled={!message}
+                  className={`p-2 ${
+                    message
+                      ? "text-red-500 hover:text-red-400"
+                      : "text-gray-500"
+                  }`}
+                >
+                  {message ? (
+                    <IoSend className="text-xl" />
+                  ) : (
+                    <FaMicrophone className="text-lg" />
+                  )}
+                </button>
               </div>
             </div>
           </>
@@ -527,14 +576,14 @@ const RaktFlowChat = () => {
               <h1 className="text-4xl font-bold text-red-500 mb-2">RaktFlow</h1>
               <p className="text-gray-200">Real-time chat application</p>
             </div>
-            <div className="max-w-md">
+            <div className="max-w-md w-full px-4">
               <img
                 src="https://illustrations.popsy.co/red/video-call.svg"
                 alt="Chat Illustration"
                 className="w-full h-auto"
               />
             </div>
-            <p className="mt-6 text-gray-500 max-w-md">
+            <p className="mt-6 text-gray-500 max-w-md px-4">
               {activeTab === "people"
                 ? "Select a person to start chatting"
                 : "Select an AI bot to get assistance"}
