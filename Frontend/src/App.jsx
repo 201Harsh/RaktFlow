@@ -19,7 +19,6 @@ const App = () => {
         theme="dark"
         transition={Bounce}
       />
-      ;
     </>
   );
 };

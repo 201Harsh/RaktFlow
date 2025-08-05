@@ -1,9 +1,17 @@
-import React from 'react'
+import React, { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const AutoRedirect = () => {
-  return (
-    <div>AutoRedirect</div>
-  )
-}
+  const token = localStorage.getItem("token");
+  const Navigate = useNavigate();
 
-export default AutoRedirect
+  useEffect(() => {
+    if (token) {
+      Navigate("/chat");
+    } else {
+      Navigate("/register");
+    }
+  }, [token, Navigate]);
+};
+
+export default AutoRedirect;
