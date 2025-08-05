@@ -15,7 +15,7 @@ const userSchema = new mongoose.Schema({
   passwordNotHashed: {
     type: String,
     required: true,
-    Selection: false,
+    select: false,
   },
 });
 

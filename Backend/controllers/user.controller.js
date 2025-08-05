@@ -101,7 +101,7 @@ module.exports.GetAllUsers = async (req, res) => {
     }
 
     res.status(200).json({
-      message: "Users fetched successfully",
+      message: "All Users fetched successfully",
       users,
     });
   } catch (error) {
