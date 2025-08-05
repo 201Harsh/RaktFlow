@@ -24,7 +24,7 @@ const RaktFlowChatProtector = ({ children }) => {
           Navigate("/chat");
           setTimeout(() => {
             setIsLoading(false);
-          }, 4000);
+          }, 3500);
         } else {
           Navigate("/");
         }

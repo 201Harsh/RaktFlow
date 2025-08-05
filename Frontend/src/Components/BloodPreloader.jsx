@@ -150,7 +150,8 @@ const BloodPreloader = ({ onFinish }) => {
       <motion.div
         className="absolute inset-0 opacity-30"
         style={{
-          backgroundImage: "radial-gradient(circle, transparent 70%, #300 100%)",
+          backgroundImage:
+            "radial-gradient(circle, transparent 70%, #300 100%)",
         }}
         animate={{
           opacity: [0.2, 0.4, 0.2],
@@ -223,6 +224,16 @@ const BloodPreloader = ({ onFinish }) => {
             />
           </motion.div>
         </div>
+      </motion.div>
+
+      {/* Large percent counter in bottom right corner */}
+      <motion.div
+        className="absolute bottom-8 right-8 text-red-500 z-10"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1 }}
+      >
+        <div className="text-6xl font-bold">{progress}%</div>
       </motion.div>
 
       {/* Subtle screen flicker for horror effect */}
