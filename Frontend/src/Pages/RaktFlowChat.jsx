@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import {
   FaSearch,
@@ -18,6 +18,7 @@ const RaktFlowChat = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [searchQuery, setSearchQuery] = useState("");
   const [chatHistories, setChatHistories] = useState({});
+  const messagesEndRef = React.useRef(null);
 
   useEffect(() => {
     const handleResize = () => {
@@ -169,6 +170,11 @@ const RaktFlowChat = () => {
     ? chatHistories[selectedUser.id] || []
     : [];
 
+  // Auto-scroll to bottom when messages change
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [currentMessages]);
+  
   return (
     <div className="flex h-screen bg-gray-950 text-gray-200 overflow-hidden">
       {/* Sidebar */}
@@ -395,6 +401,7 @@ const RaktFlowChat = () => {
                     </motion.div>
                   ))
                 )}
+                <div ref={messagesEndRef} />
               </div>
             </div>
 
