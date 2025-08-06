@@ -42,7 +42,7 @@ const RaktFlowChat = () => {
       lastMessage: "Hey, how are you?",
       time: "10:30 AM",
       unread: 2,
-      status: "online",
+      status: "Online",
     },
     {
       id: 2,
@@ -60,7 +60,7 @@ const RaktFlowChat = () => {
       lastMessage: "Please review the docs",
       time: "Yesterday",
       unread: 5,
-      status: "online",
+      status: "Online",
     },
     {
       id: 4,
@@ -431,7 +431,7 @@ const RaktFlowChat = () => {
                 )}
                 <div className="ml-3">
                   <h3 className="font-medium">{selectedUser.name}</h3>
-                  <p className="text-xs text-gray-400">
+                  <p className="text-xs text-green-400">
                     {selectedUser.isBot
                       ? "AI Assistant"
                       : selectedUser.status || "Online"}
