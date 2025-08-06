@@ -63,7 +63,7 @@ const BloodPreloader = ({ onFinish }) => {
 
     // Text reveal sequence
     const sequence = async () => {
-      await textControls.start({ opacity: 1, y: 0 }, { delay: 0.2 });
+      await textControls.start({ opacity: 1, y: 0 }, { delay: 0.1 });
       await textControls.start({
         scale: 1.05,
         transition: { repeat: 3, repeatType: "reverse", duration: 0.3 },
@@ -211,7 +211,7 @@ const BloodPreloader = ({ onFinish }) => {
             className="mt-8 h-2 bg-gray-800 rounded-full overflow-hidden max-w-md mx-auto"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 1.5 }}
+            transition={{ delay: 0.3 }}
           >
             <motion.div
               className="h-full bg-red-600 rounded-full origin-left"
