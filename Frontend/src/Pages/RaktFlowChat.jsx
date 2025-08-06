@@ -42,6 +42,7 @@ const RaktFlowChat = () => {
           setCurrentUser(res.data.user);
         }
       } catch (error) {
+        console.error("Failed to fetch current user", error);
       }
     };
     fetchCurrentUser();
@@ -52,38 +53,38 @@ const RaktFlowChat = () => {
     if (!currentUser) return;
 
     const handleReceiveMessage = (msg) => {
-  
-  // Only add message if it's for the current chat
-  if (selectedUser && (
-    (msg.senderId === selectedUser._id && msg.receiverId === currentUser._id) ||
-    (msg.senderId === currentUser._id && msg.receiverId === selectedUser._id)
-  )) {  // Added missing closing parenthesis here
-    const newMessage = {
-      id: msg.id || Date.now(),
-      text: msg.text,
-      sender: msg.senderId === currentUser._id ? "me" : "them",
-      time: new Date(msg.time || Date.now()).toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-      image: msg.image || null
-    };
+      // Only add message if it's for the current chat
+      if (selectedUser && (
+        (msg.senderId === selectedUser._id && msg.receiverId === currentUser._id) ||
+        (msg.senderId === currentUser._id && msg.receiverId === selectedUser._id)
+      )) {
+        const newMessage = {
+          id: msg.id || Date.now(),
+          text: msg.text,
+          sender: msg.senderId === currentUser._id ? "me" : "them",
+          senderId: msg.senderId,
+          time: new Date(msg.time || Date.now()).toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+          image: msg.image || null
+        };
 
-    setChatHistories((prev) => {
-      const existingMessages = prev[selectedUser._id] || [];
-      
-      // Check if message already exists to prevent duplicates
-      if (existingMessages.some(m => m.id === newMessage.id)) {
-        return prev;
+        setChatHistories((prev) => {
+          const existingMessages = prev[selectedUser._id] || [];
+          
+          // Check if message already exists to prevent duplicates
+          if (existingMessages.some(m => m.id === newMessage.id)) {
+            return prev;
+          }
+          
+          return {
+            ...prev,
+            [selectedUser._id]: [...existingMessages, newMessage],
+          };
+        });
       }
-      
-      return {
-        ...prev,
-        [selectedUser._id]: [...existingMessages, newMessage],
-      };
-    });
-  }
-};
+    };
 
     socket.on("receiveMessage", handleReceiveMessage);
 
@@ -123,14 +124,18 @@ const RaktFlowChat = () => {
       try {
         const res = await AxiosInstance.get("/users/all");
         if (res.status === 200) {
-          setPeoples(res.data.users);
-        } else {
+          // Filter out the current user from the people list
+          const filteredUsers = res.data.users.filter(user => 
+            user._id !== currentUser?._id
+          );
+          setPeoples(filteredUsers);
         }
       } catch (error) {
+        console.error("Error fetching users:", error);
       }
     };
     handleGetUsers();
-  }, []);
+  }, [currentUser]);
 
   const bots = [
     {
@@ -191,6 +196,7 @@ const RaktFlowChat = () => {
       id: newMessage.id,
       text: newMessage.text,
       sender: "me",
+      senderId: currentUser._id,
       time: new Date().toLocaleTimeString([], {
         hour: "2-digit",
         minute: "2-digit",
@@ -236,6 +242,7 @@ const RaktFlowChat = () => {
         id: newMessage.id,
         image: newMessage.image,
         sender: "me",
+        senderId: currentUser._id,
         time: new Date().toLocaleTimeString([], {
           hour: "2-digit",
           minute: "2-digit",
@@ -475,16 +482,27 @@ const RaktFlowChat = () => {
           )}
         </div>
 
-        {/* Logout Button */}
-        <div className="p-3 border-t border-gray-800">
-          <button
-            onClick={handleLogout}
-            className="w-full flex items-center justify-center space-x-2 py-2 px-4 bg-gray-800 hover:bg-gray-700 rounded-lg text-red-500 transition-colors"
-          >
-            <FaSignOutAlt />
-            <span>Logout</span>
-          </button>
-        </div>
+        {/* Current User Profile */}
+        {currentUser && (
+          <div className="p-3 border-t border-gray-800 flex items-center">
+            <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center">
+              <span className="text-lg text-red-500">
+                {currentUser.username?.charAt(0).toUpperCase()}
+              </span>
+            </div>
+            <div className="ml-3 flex-1 min-w-0">
+              <h3 className="font-medium truncate">{currentUser.username}</h3>
+              <p className="text-xs text-green-400">Online</p>
+            </div>
+            <button
+              onClick={handleLogout}
+              className="p-2 text-gray-400 hover:text-red-500"
+              title="Logout"
+            >
+              <FaSignOutAlt />
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Chat Area */}
@@ -597,7 +615,7 @@ const RaktFlowChat = () => {
                                   : "text-gray-400/90"
                               }`}
                             >
-                              {msg.time}
+                              {msg.sender === "me" ? "You" : selectedUser.username || selectedUser.name} • {msg.time}
                             </p>
                           </div>
                         </motion.div>
