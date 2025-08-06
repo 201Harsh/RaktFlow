@@ -4,8 +4,16 @@ import { FaTint } from "react-icons/fa";
 
 const BloodPreloader = ({ onFinish }) => {
   const [progress, setProgress] = useState(0);
+  const [currentPromptIndex, setCurrentPromptIndex] = useState(0);
   const controls = useAnimation();
   const textControls = useAnimation();
+
+  // Prompts that will cycle through
+  const prompts = [
+    "RaktFlow: Enter the shadows of conversation",
+    "RaktFlow is syncing your messages...",
+    "RaktFlow is connecting the unseen...",
+  ];
 
   // Realistic blood viscosity simulation
   const bloodVariants = {
@@ -73,6 +81,15 @@ const BloodPreloader = ({ onFinish }) => {
 
     return () => clearInterval(interval);
   }, [controls, textControls, onFinish]);
+
+  // Change prompt based on progress
+  useEffect(() => {
+    const promptInterval = setInterval(() => {
+      setCurrentPromptIndex((prev) => (prev + 1) % prompts.length);
+    }, 1500); // Change prompt every 1.5 seconds
+
+    return () => clearInterval(promptInterval);
+  }, []);
 
   return (
     <div className="fixed inset-0 bg-black z-50 overflow-hidden">
@@ -204,6 +221,29 @@ const BloodPreloader = ({ onFinish }) => {
                 Flow
               </motion.span>
             </h1>
+          </motion.div>
+
+          {/* Rotating prompt text */}
+          <motion.div
+            className="mt-4 text-xl text-red-300 max-w-md mx-auto h-10"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.8 }}
+          >
+            {prompts.map((prompt, index) => (
+              <motion.div
+                key={prompt}
+                className="absolute w-full text-center"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{
+                  opacity: currentPromptIndex === index ? 1 : 0,
+                  y: currentPromptIndex === index ? 0 : 10,
+                }}
+                transition={{ duration: 0.5 }}
+              >
+                {prompt}
+              </motion.div>
+            ))}
           </motion.div>
 
           {/* Progress bar with heartbeat pulse */}
