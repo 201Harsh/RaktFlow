@@ -17,6 +17,7 @@ import AxiosInstance from "../Config/Axios";
 import { Bounce, toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import socket from "../Config/SocketIO";
+import FollowPopup from "../Utils/FollowPopUp";
 
 const RaktFlowChat = () => {
   const [selectedUser, setSelectedUser] = useState(null);
@@ -28,10 +29,31 @@ const RaktFlowChat = () => {
   const [showSearch, setShowSearch] = useState(false);
   const [peoples, setPeoples] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
+  const [showFollowPopup, setShowFollowPopup] = useState(false);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
 
   const Navigate = useNavigate();
+
+  useEffect(() => {
+    // Check if the popup has been shown before
+    const hasSeenPopup = localStorage.getItem("hasSeenFollowPopup");
+
+    if (!hasSeenPopup) {
+      // Show popup after a short delay (e.g., 3 seconds after page loads)
+      const timer = setTimeout(() => {
+        setShowFollowPopup(true);
+      }, 400);
+
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
+  const closeFollowPopup = () => {
+    setShowFollowPopup(false);
+    // Store in localStorage that the user has seen the popup
+    localStorage.setItem("hasSeenFollowPopup", "true");
+  };
 
   // Get current user data
   useEffect(() => {
@@ -54,10 +76,13 @@ const RaktFlowChat = () => {
 
     const handleReceiveMessage = (msg) => {
       // Only add message if it's for the current chat
-      if (selectedUser && (
-        (msg.senderId === selectedUser._id && msg.receiverId === currentUser._id) ||
-        (msg.senderId === currentUser._id && msg.receiverId === selectedUser._id)
-      )) {
+      if (
+        selectedUser &&
+        ((msg.senderId === selectedUser._id &&
+          msg.receiverId === currentUser._id) ||
+          (msg.senderId === currentUser._id &&
+            msg.receiverId === selectedUser._id))
+      ) {
         const newMessage = {
           id: msg.id || Date.now(),
           text: msg.text,
@@ -67,17 +92,17 @@ const RaktFlowChat = () => {
             hour: "2-digit",
             minute: "2-digit",
           }),
-          image: msg.image || null
+          image: msg.image || null,
         };
 
         setChatHistories((prev) => {
           const existingMessages = prev[selectedUser._id] || [];
-          
+
           // Check if message already exists to prevent duplicates
-          if (existingMessages.some(m => m.id === newMessage.id)) {
+          if (existingMessages.some((m) => m.id === newMessage.id)) {
             return prev;
           }
-          
+
           return {
             ...prev,
             [selectedUser._id]: [...existingMessages, newMessage],
@@ -101,7 +126,7 @@ const RaktFlowChat = () => {
     const roomId = [currentUser._id, selectedUser._id || selectedUser.id]
       .sort()
       .join("-");
-    
+
     socket.emit("joinRoom", roomId);
 
     return () => {
@@ -125,8 +150,8 @@ const RaktFlowChat = () => {
         const res = await AxiosInstance.get("/users/all");
         if (res.status === 200) {
           // Filter out the current user from the people list
-          const filteredUsers = res.data.users.filter(user => 
-            user._id !== currentUser?._id
+          const filteredUsers = res.data.users.filter(
+            (user) => user._id !== currentUser?._id
           );
           setPeoples(filteredUsers);
         }
@@ -335,6 +360,9 @@ const RaktFlowChat = () => {
 
   return (
     <div className="flex h-screen bg-gray-950 text-gray-200 overflow-hidden">
+      {/* Follow Popup */}
+      {showFollowPopup && <FollowPopup onClose={closeFollowPopup} />}
+
       {/* Sidebar */}
       <div
         className={`${
@@ -615,7 +643,11 @@ const RaktFlowChat = () => {
                                   : "text-gray-400/90"
                               }`}
                             >
-                              {msg.sender === "me" ? "You" : selectedUser.username || selectedUser.name} • {msg.time}
+                              {msg.sender === "me"
+                                ? "You"
+                                : selectedUser.username ||
+                                  selectedUser.name}{" "}
+                              • {msg.time}
                             </p>
                           </div>
                         </motion.div>
