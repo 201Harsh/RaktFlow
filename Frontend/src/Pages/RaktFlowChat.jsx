@@ -8,11 +8,14 @@ import {
   FaSmile,
   FaChevronLeft,
   FaTimes,
+  FaSignOutAlt,
 } from "react-icons/fa";
 import { IoMdSend } from "react-icons/io";
 import { BsRobot, BsThreeDotsVertical } from "react-icons/bs";
 import { IoSend } from "react-icons/io5";
 import AxiosInstance from "../Config/Axios";
+import { Bounce, toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const RaktFlowChat = () => {
   const [selectedUser, setSelectedUser] = useState(null);
@@ -25,6 +28,8 @@ const RaktFlowChat = () => {
   const [peoples, setPeoples] = useState([]);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
+
+  const Navigate = useNavigate();
 
   // Detect mobile/desktop
   useEffect(() => {
@@ -201,6 +206,41 @@ const RaktFlowChat = () => {
     setShowSearch(false);
   };
 
+  const handleLogout = async () => {
+    try {
+      const response = await AxiosInstance.post("/users/logout", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+
+      if (response.status === 200) {
+        localStorage.clear();
+        toast.success(response.data.message, {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+          transition: Bounce,
+        });
+        Navigate("/");
+      }
+    } catch (error) {
+      console.log(error);
+      console.error("Logout failed:", error);
+      toast.error(error.response?.data?.message || "Logout failed", {
+        position: "top-right",
+        autoClose: 5000,
+        theme: "dark",
+        transition: Bounce,
+      });
+    }
+  };
+
   const currentMessages = selectedUser
     ? chatHistories[selectedUser._id || selectedUser.id] || []
     : [];
@@ -363,6 +403,17 @@ const RaktFlowChat = () => {
             </div>
           )}
         </div>
+
+        {/* Logout Button */}
+        <div className="p-3 border-t border-gray-800">
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center justify-center space-x-2 py-2 px-4 bg-gray-800 hover:bg-gray-700 rounded-lg text-red-500 transition-colors"
+          >
+            <FaSignOutAlt />
+            <span>Logout</span>
+          </button>
+        </div>
       </div>
 
       {/* Chat Area */}
@@ -422,7 +473,7 @@ const RaktFlowChat = () => {
 
             {/* Messages */}
             <div className="flex-1 overflow-y-auto bg-[url(./assets/img/bg22.jpg)] bg-cover bg-no-repeat bg-center">
-              <div className="min-h-full w-full px-2 sm:px-4 pt-16 pb-24 backdrop-blur-sm bg-gray-950/30 rounded-lg">
+              <div className="min-h-full w-full px-2 sm:px-4 pt-16 pb-24 backdrop-blur-sm bg-gray-950/30">
                 {currentMessages.length === 0 ? (
                   <div className="h-full flex flex-col items-center justify-center text-center text-gray-300 p-4">
                     <div className="backdrop-blur-xl bg-gray-900/80 p-6 rounded-xl border border-red-900/30 max-w-md">
@@ -489,57 +540,59 @@ const RaktFlowChat = () => {
 
             {/* Message Input */}
             <div className="p-3 fixed bottom-0 w-full z-50 border-t border-gray-800 bg-gray-900/80 backdrop-blur-sm">
-              <div className="flex items-center">
-                <div className="relative">
-                  <button
-                    className="p-2 text-gray-400 hover:text-red-500"
-                    onClick={() =>
-                      document.getElementById("file-upload").click()
-                    }
-                  >
-                    <FaPaperclip className="text-lg" />
+              <div className="max-w-4xl mx-auto w-full">
+                <div className="flex items-center">
+                  <div className="relative">
+                    <button
+                      className="p-2 text-gray-400 hover:text-red-500"
+                      onClick={() =>
+                        document.getElementById("file-upload").click()
+                      }
+                    >
+                      <FaPaperclip className="text-lg" />
+                    </button>
+                    <input
+                      id="file-upload"
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleImageUpload}
+                    />
+                  </div>
+
+                  <button className="p-2 text-gray-400 hover:text-red-500">
+                    <FaSmile className="text-lg" />
                   </button>
-                  <input
-                    id="file-upload"
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={handleImageUpload}
-                  />
+
+                  <div className="flex-1 mx-2 relative">
+                    <textarea
+                      ref={inputRef}
+                      value={message}
+                      onChange={(e) => setMessage(e.target.value)}
+                      onKeyDown={handleKeyPress}
+                      placeholder="Type a message"
+                      className="w-full py-2 px-4 bg-gray-800 rounded-full text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-red-500 resize-none max-h-32"
+                      rows="1"
+                      style={{ minHeight: "40px" }}
+                    />
+                  </div>
+
+                  <button
+                    onClick={handleSendMessage}
+                    disabled={!message}
+                    className={`p-2 ${
+                      message
+                        ? "text-red-500 hover:text-red-400"
+                        : "text-gray-500"
+                    }`}
+                  >
+                    {message ? (
+                      <IoSend className="text-xl" />
+                    ) : (
+                      <FaMicrophone className="text-lg" />
+                    )}
+                  </button>
                 </div>
-
-                <button className="p-2 text-gray-400 hover:text-red-500">
-                  <FaSmile className="text-lg" />
-                </button>
-
-                <div className="flex-1 mx-2 relative">
-                  <textarea
-                    ref={inputRef}
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    onKeyDown={handleKeyPress}
-                    placeholder="Type a message"
-                    className="w-full py-2 px-4 bg-gray-800 rounded-full text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-red-500 resize-none max-h-32"
-                    rows="1"
-                    style={{ minHeight: "40px" }}
-                  />
-                </div>
-
-                <button
-                  onClick={handleSendMessage}
-                  disabled={!message}
-                  className={`p-2 ${
-                    message
-                      ? "text-red-500 hover:text-red-400"
-                      : "text-gray-500"
-                  }`}
-                >
-                  {message ? (
-                    <IoSend className="text-xl" />
-                  ) : (
-                    <FaMicrophone className="text-lg" />
-                  )}
-                </button>
               </div>
             </div>
           </>

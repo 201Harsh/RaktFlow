@@ -5,14 +5,18 @@ import { Bounce, toast } from "react-toastify";
 import BloodPreloader from "./BloodPreloader";
 
 const RaktFlowChatProtector = ({ children }) => {
-  const [IsLoading, setIsLoading] = useState(true);
-  const Navigate = useNavigate();
-  const token = localStorage.getItem("token");
+  const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    // Redirect early if token not found
     if (!token) {
-      Navigate("/");
+      navigate("/");
+      return;
     }
+
     const checkUser = async () => {
       try {
         const res = await AxiosInstance.get("/users/profile", {
@@ -20,41 +24,37 @@ const RaktFlowChatProtector = ({ children }) => {
             Authorization: `Bearer ${token}`,
           },
         });
+
         if (res.status === 200) {
-          Navigate("/chat");
-          setTimeout(() => {
-            setIsLoading(false);
-          }, 3500);
+          setIsLoading(false);
         } else {
-          Navigate("/");
+          localStorage.clear();
+          toast.error("Unauthorized", {
+            position: "top-right",
+            autoClose: 5000,
+            theme: "dark",
+            transition: Bounce,
+          })
+          navigate("/");
         }
       } catch (error) {
         console.log(error);
-        toast.error(error.response.data.message, {
+        toast.error(error.response.data?.message || "Unauthorized", {
           position: "top-right",
           autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
           theme: "dark",
           transition: Bounce,
         });
         localStorage.clear();
-        Navigate("/");
+        navigate("/");
       }
     };
 
     checkUser();
-  }, [token, Navigate]);
+  }, [navigate]);
 
-  if (IsLoading) {
-    return (
-      <>
-        <BloodPreloader />
-      </>
-    );
+  if (isLoading) {
+    return <BloodPreloader />;
   }
 
   return <>{children}</>;
