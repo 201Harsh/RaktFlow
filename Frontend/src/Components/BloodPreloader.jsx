@@ -228,7 +228,7 @@ const BloodPreloader = ({ onFinish }) => {
             className="mt-4 text-xl text-red-300 max-w-md mx-auto h-10"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.8 }}
+            transition={{ delay: 0.1 }}
           >
             {prompts.map((prompt, index) => (
               <motion.div
