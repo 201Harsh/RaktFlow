@@ -207,10 +207,11 @@ const RaktFlowChat = () => {
   };
 
   const handleLogout = async () => {
+    const token = localStorage.getItem("token");
     try {
       const response = await AxiosInstance.post("/users/logout", {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 
@@ -538,60 +539,60 @@ const RaktFlowChat = () => {
               </div>
             </div>
 
-            {/* Message Input */}
-            <div className="p-3 fixed bottom-0 w-full z-50 border-t border-gray-800 bg-gray-900/80 backdrop-blur-sm">
-              <div className="max-w-4xl mx-auto w-full">
-                <div className="flex items-center">
-                  <div className="relative">
+            {/* Message Input - Updated Section */}
+            <div className="p-3 fixed bottom-0 md:left-1/3 lg:left-1/4 left-0 right-0 max-w-screen z-50 border-t border-gray-800 bg-gray-900/80 backdrop-blur-sm">
+              <div className="flex justify-center">
+                <div className="px-2 w-full">
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center">
+                      <button
+                        className="p-2 text-gray-400 hover:text-red-500"
+                        onClick={() =>
+                          document.getElementById("file-upload").click()
+                        }
+                      >
+                        <FaPaperclip className="text-lg" />
+                      </button>
+                      <input
+                        id="file-upload"
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleImageUpload}
+                      />
+                      <button className="p-2 text-gray-400 hover:text-red-500">
+                        <FaSmile className="text-lg" />
+                      </button>
+                    </div>
+
+                    <div className="flex-1 relative">
+                      <textarea
+                        ref={inputRef}
+                        value={message}
+                        onChange={(e) => setMessage(e.target.value)}
+                        onKeyDown={handleKeyPress}
+                        placeholder="Type a message"
+                        className="w-full py-2 px-4 bg-gray-800 rounded-full text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-red-500 resize-none max-h-32 transition-all duration-200"
+                        rows="1"
+                      />
+                    </div>
+
                     <button
-                      className="p-2 text-gray-400 hover:text-red-500"
-                      onClick={() =>
-                        document.getElementById("file-upload").click()
-                      }
+                      onClick={handleSendMessage}
+                      disabled={!message}
+                      className={`p-2 rounded-full ${
+                        message
+                          ? "text-red-500 hover:text-red-400"
+                          : "text-gray-500"
+                      }`}
                     >
-                      <FaPaperclip className="text-lg" />
+                      {message ? (
+                        <IoSend className="text-xl" />
+                      ) : (
+                        <FaMicrophone className="text-lg" />
+                      )}
                     </button>
-                    <input
-                      id="file-upload"
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={handleImageUpload}
-                    />
                   </div>
-
-                  <button className="p-2 text-gray-400 hover:text-red-500">
-                    <FaSmile className="text-lg" />
-                  </button>
-
-                  <div className="flex-1 mx-2 relative">
-                    <textarea
-                      ref={inputRef}
-                      value={message}
-                      onChange={(e) => setMessage(e.target.value)}
-                      onKeyDown={handleKeyPress}
-                      placeholder="Type a message"
-                      className="w-full py-2 px-4 bg-gray-800 rounded-full text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-red-500 resize-none max-h-32"
-                      rows="1"
-                      style={{ minHeight: "40px" }}
-                    />
-                  </div>
-
-                  <button
-                    onClick={handleSendMessage}
-                    disabled={!message}
-                    className={`p-2 ${
-                      message
-                        ? "text-red-500 hover:text-red-400"
-                        : "text-gray-500"
-                    }`}
-                  >
-                    {message ? (
-                      <IoSend className="text-xl" />
-                    ) : (
-                      <FaMicrophone className="text-lg" />
-                    )}
-                  </button>
                 </div>
               </div>
             </div>

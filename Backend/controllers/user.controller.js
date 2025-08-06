@@ -29,7 +29,7 @@ module.exports.RegisterUser = async (req, res) => {
 
     const token = User.jwtToken();
 
-    res.cookie("token", token, {});
+    res.cookie("token", token);
 
     res.status(200).json({
       message: "User created successfully",
@@ -70,7 +70,7 @@ module.exports.LoginUser = async (req, res) => {
 
     const token = User.jwtToken();
 
-    res.cookie("token", token, {});
+    res.cookie("token", token);
 
     res.status(200).json({
       message: "User logged in successfully",
