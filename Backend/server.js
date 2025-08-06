@@ -9,13 +9,82 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: process.env.CLIENT_URL, // your frontend URL
+    origin: process.env.CLIENT_URL,
     methods: ["GET", "POST"],
+    credentials: true
   },
 });
 
+// Store active rooms and their participants
+const activeRooms = {};
+
 io.on("connection", (socket) => {
-  console.log("a user connected");
+
+  // Handle joining a room (private chat between two users)
+  socket.on("joinRoom", (roomId) => {
+    socket.join(roomId);
+    
+    // Track room participants
+    if (!activeRooms[roomId]) {
+      activeRooms[roomId] = new Set();
+    }
+    activeRooms[roomId].add(socket.id);
+  });
+
+  // Handle leaving a room
+  socket.on("leaveRoom", (roomId) => {
+    socket.leave(roomId);
+    
+    if (activeRooms[roomId]) {
+      activeRooms[roomId].delete(socket.id);
+      if (activeRooms[roomId].size === 0) {
+        delete activeRooms[roomId];
+      }
+    }
+  });
+
+  // Handle sending a message
+  socket.on("sendMessage", (messageData) => {
+    try {
+      const { senderId, receiverId, text, image } = messageData;
+      
+      if (!senderId || !receiverId) {
+        return;
+      }
+
+      // Create a room ID by combining and sorting the user IDs
+      const roomId = [senderId, receiverId].sort().join("-");
+      
+      // Create the message object
+      const message = {
+        id: messageData.id || Date.now(),
+        senderId,
+        receiverId,
+        text: text || (image ? "Image shared" : ""),
+        image: image || null,
+        time: new Date().toISOString(),
+      };
+
+      
+      // Send to all in the room (both sender and receiver)
+      io.to(roomId).emit("receiveMessage", message);
+    } catch (error) {
+    }
+  });
+
+  // Handle disconnection
+  socket.on("disconnect", () => {
+    
+    // Clean up room participation
+    for (const roomId in activeRooms) {
+      if (activeRooms[roomId].has(socket.id)) {
+        activeRooms[roomId].delete(socket.id);
+        if (activeRooms[roomId].size === 0) {
+          delete activeRooms[roomId];
+        }
+      }
+    }
+  });
 });
 
 const port = process.env.PORT || 6000;

@@ -27,10 +27,86 @@ const RaktFlowChat = () => {
   const [chatHistories, setChatHistories] = useState({});
   const [showSearch, setShowSearch] = useState(false);
   const [peoples, setPeoples] = useState([]);
+  const [currentUser, setCurrentUser] = useState(null);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
 
   const Navigate = useNavigate();
+
+  // Get current user data
+  useEffect(() => {
+    const fetchCurrentUser = async () => {
+      try {
+        const res = await AxiosInstance.get("/users/profile");
+        if (res.status === 200) {
+          setCurrentUser(res.data.user);
+        }
+      } catch (error) {
+      }
+    };
+    fetchCurrentUser();
+  }, []);
+
+  // Socket.IO message handling
+  useEffect(() => {
+    if (!currentUser) return;
+
+    const handleReceiveMessage = (msg) => {
+  
+  // Only add message if it's for the current chat
+  if (selectedUser && (
+    (msg.senderId === selectedUser._id && msg.receiverId === currentUser._id) ||
+    (msg.senderId === currentUser._id && msg.receiverId === selectedUser._id)
+  )) {  // Added missing closing parenthesis here
+    const newMessage = {
+      id: msg.id || Date.now(),
+      text: msg.text,
+      sender: msg.senderId === currentUser._id ? "me" : "them",
+      time: new Date(msg.time || Date.now()).toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+      image: msg.image || null
+    };
+
+    setChatHistories((prev) => {
+      const existingMessages = prev[selectedUser._id] || [];
+      
+      // Check if message already exists to prevent duplicates
+      if (existingMessages.some(m => m.id === newMessage.id)) {
+        return prev;
+      }
+      
+      return {
+        ...prev,
+        [selectedUser._id]: [...existingMessages, newMessage],
+      };
+    });
+  }
+};
+
+    socket.on("receiveMessage", handleReceiveMessage);
+
+    // Cleanup listener on unmount
+    return () => {
+      socket.off("receiveMessage", handleReceiveMessage);
+    };
+  }, [selectedUser, currentUser]);
+
+  // Join room when user is selected
+  useEffect(() => {
+    if (!currentUser || !selectedUser) return;
+
+    const roomId = [currentUser._id, selectedUser._id || selectedUser.id]
+      .sort()
+      .join("-");
+    
+    socket.emit("joinRoom", roomId);
+
+    return () => {
+      socket.emit("leaveRoom", roomId);
+    };
+  }, [selectedUser, currentUser]);
 
   // Detect mobile/desktop
   useEffect(() => {
@@ -41,13 +117,16 @@ const RaktFlowChat = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // Fetch users list
   useEffect(() => {
     const handleGetUsers = async () => {
-      const res = await AxiosInstance.get("/users/all");
-      if (res.status === 200) {
-        setPeoples(res.data.users);
-      } else {
-        console.error("Failed to fetch users");
+      try {
+        const res = await AxiosInstance.get("/users/all");
+        if (res.status === 200) {
+          setPeoples(res.data.users);
+        } else {
+        }
+      } catch (error) {
       }
     };
     handleGetUsers();
@@ -97,11 +176,20 @@ const RaktFlowChat = () => {
   );
 
   const handleSendMessage = () => {
-    if (message.trim() === "" || !selectedUser) return;
+    if (message.trim() === "" || !selectedUser || !currentUser) return;
 
     const newMessage = {
       id: Date.now(),
       text: message,
+      senderId: currentUser._id,
+      receiverId: selectedUser._id || selectedUser.id,
+      time: new Date().toISOString(),
+    };
+
+    // Optimistically update UI
+    const uiMessage = {
+      id: newMessage.id,
+      text: newMessage.text,
       sender: "me",
       time: new Date().toLocaleTimeString([], {
         hour: "2-digit",
@@ -111,19 +199,43 @@ const RaktFlowChat = () => {
 
     setChatHistories((prev) => ({
       ...prev,
-      [selectedUser._id]: [...(prev[selectedUser._id] || []), newMessage],
+      [selectedUser._id]: [...(prev[selectedUser._id] || []), uiMessage],
     }));
+
+    socket.emit("sendMessage", newMessage);
 
     setMessage("");
 
-    // Simulate reply
+    // Auto-scroll to bottom
     setTimeout(() => {
-      const reply = {
-        id: Date.now() + 1,
-        text: selectedUser.isBot
-          ? `This is an automated reply from ${selectedUser.name}. How can I assist you further?`
-          : `This is a simulated reply from ${selectedUser.username}`,
-        sender: "them",
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, 100);
+  };
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (!file || !selectedUser || !currentUser) return;
+
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("Please select an image smaller than 10MB");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const newMessage = {
+        id: Date.now(),
+        image: event.target.result,
+        senderId: currentUser._id,
+        receiverId: selectedUser._id || selectedUser.id,
+        time: new Date().toISOString(),
+      };
+
+      // Optimistically update UI
+      const uiMessage = {
+        id: newMessage.id,
+        image: newMessage.image,
+        sender: "me",
         time: new Date().toLocaleTimeString([], {
           hour: "2-digit",
           minute: "2-digit",
@@ -132,58 +244,21 @@ const RaktFlowChat = () => {
 
       setChatHistories((prev) => ({
         ...prev,
-        [selectedUser._id]: [...(prev[selectedUser._id] || []), reply],
+        [selectedUser._id]: [...(prev[selectedUser._id] || []), uiMessage],
       }));
-    }, 1000);
-  };
 
-  const handleImageUpload = (e) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      if (file.size > 10 * 1024 * 1024) {
-        alert("Please select an image smaller than 10MB");
-        return;
-      }
+      // Send message via socket
+      socket.emit("sendMessage", {
+        ...newMessage,
+        text: "Image shared",
+      });
 
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const newMessage = {
-          id: Date.now(),
-          image: event.target.result,
-          sender: "me",
-          time: new Date().toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-          }),
-        };
-
-        setChatHistories((prev) => ({
-          ...prev,
-          [selectedUser._id]: [...(prev[selectedUser._id] || []), newMessage],
-        }));
-
-        // Simulate reply
-        setTimeout(() => {
-          const reply = {
-            id: Date.now() + 1,
-            text: selectedUser.isBot
-              ? `Nice image! This is an automated reply from ${selectedUser.name}.`
-              : `This is a simulated reply to your image from ${selectedUser.username}`,
-            sender: "them",
-            time: new Date().toLocaleTimeString([], {
-              hour: "2-digit",
-              minute: "2-digit",
-            }),
-          };
-
-          setChatHistories((prev) => ({
-            ...prev,
-            [selectedUser._id]: [...(prev[selectedUser._id] || []), reply],
-          }));
-        }, 1000);
-      };
-      reader.readAsDataURL(file);
-    }
+      // Auto-scroll to bottom
+      setTimeout(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+      }, 100);
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleKeyPress = (e) => {
@@ -210,7 +285,7 @@ const RaktFlowChat = () => {
   const handleLogout = async () => {
     const token = localStorage.getItem("token");
     try {
-      const response = await AxiosInstance.post("/users/logout", {
+      const response = await AxiosInstance.post("/users/logout", null, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -218,6 +293,7 @@ const RaktFlowChat = () => {
 
       if (response.status === 200) {
         localStorage.clear();
+        socket.disconnect();
         toast.success(response.data.message, {
           position: "top-right",
           autoClose: 5000,
@@ -232,8 +308,6 @@ const RaktFlowChat = () => {
         Navigate("/");
       }
     } catch (error) {
-      console.log(error);
-      console.error("Logout failed:", error);
       toast.error(error.response?.data?.message || "Logout failed", {
         position: "top-right",
         autoClose: 5000,
@@ -247,15 +321,10 @@ const RaktFlowChat = () => {
     ? chatHistories[selectedUser._id || selectedUser.id] || []
     : [];
 
-  // Auto-scroll to bottom
+  // Auto-scroll to bottom when messages change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [currentMessages]);
-
-  // Add emoji to message
-  const addEmoji = (emoji) => {
-    setMessage((prev) => prev + emoji.native);
-  };
 
   return (
     <div className="flex h-screen bg-gray-950 text-gray-200 overflow-hidden">
@@ -540,7 +609,7 @@ const RaktFlowChat = () => {
               </div>
             </div>
 
-            {/* Message Input - Updated Section */}
+            {/* Message Input */}
             <div className="p-3 fixed bottom-0 md:left-1/3 lg:left-1/4 left-0 right-0 max-w-screen z-50 border-t border-gray-800 bg-gray-900/80 backdrop-blur-sm">
               <div className="flex justify-center">
                 <div className="px-2 w-full">
