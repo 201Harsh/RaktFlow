@@ -63,7 +63,7 @@ const BloodPreloader = ({ onFinish }) => {
 
     // Text reveal sequence
     const sequence = async () => {
-      await textControls.start({ opacity: 1, y: 0 }, { delay: 1.2 });
+      await textControls.start({ opacity: 1, y: 0 }, { delay: 0.2 });
       await textControls.start({
         scale: 1.05,
         transition: { repeat: 3, repeatType: "reverse", duration: 0.3 },
