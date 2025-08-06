@@ -15,7 +15,7 @@ const RaktFlowChatProtector = ({ children }) => {
     }
     const checkUser = async () => {
       try {
-        const res = await AxiosInstance.get("/users/all", {
+        const res = await AxiosInstance.get("/users/profile", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
