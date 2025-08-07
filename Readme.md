@@ -3,7 +3,7 @@
 
 ![RaktFlow Banner](https://img.shields.io/badge/RaktFlow-Secure_1v1_Chat_App-darkred?style=for-the-badge&logo=chat&logoColor=white&color=7B1E1E&labelColor=000000)
 
-A secure and minimal MERN-based private chat application that supports real-time 1v1 conversations, AI-powered chatbot interactions, and a smooth authentication experience — built with privacy at its core.
+RaktFlow is a secure, real-time SaaS chat platform designed for private 1v1 conversations — fast, encrypted, and minimal. Featuring seamless login, intelligent user discovery, and an integrated AI chatbot system powered by EndGaming AI, RaktFlow offers users a unique blend of privacy, speed, and smart interaction. Whether you're chatting with friends or engaging in deep conversations with bots, your messages stay yours — always private, always flowing.
 
 [![React](https://img.shields.io/badge/React-18.2.0-blue)](https://reactjs.org)
 [![Node.js](https://img.shields.io/badge/Node-18.16.0-green)](https://nodejs.org)
