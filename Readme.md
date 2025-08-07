@@ -200,4 +200,62 @@ Permission is hereby granted, free of charge, to any person obtaining a copy...
 
 ---
 
+
+# 🤝 Contributing to RaktFlow
+
+We welcome all contributions to make **RaktFlow** even better! Whether you're fixing bugs, improving the UI, enhancing chatbot logic, or adding new features — your help is valued and appreciated.
+
+---
+
+## 🛠 How to Contribute
+
+1. **Fork the repository**  
+2. **Clone your fork to your local machine**
+
+```bash
+git clone https://github.com/201Harsh/RaktFlow.git
+```
+
+3. **Create a new branch for your feature/fix**
+
+```bash
+git checkout -b feature/YourFeatureName
+```
+
+4. **Make your changes and commit**
+
+```bash
+git commit -m "Add: Description of your feature"
+```
+
+5. **Push to your branch**
+
+```bash
+git push origin feature/YourFeatureName
+```
+
+6. **Open a Pull Request** on the main repo with a clear description of what you’ve done.
+
+---
+
+## 🧪 Contribution Ideas
+
+- 🧱 Add support for emojis, images, or file sharing
+- 🔐 Implement more end-to-end encryption
+- 🤖 Improve AI bot responses using GPT/Gemini API  
+- 🧑‍🎨 Refactor or redesign UI components (Tailwind + Plan CSS)  
+- 💬 Add message read receipts or typing indicators 
+- 🌍 Add internationalization / localization support 
+- 🌐 Add User's Online/Offline Feature
+
+---
+
+## 📜 Guidelines
+
+- Follow consistent code style (Prettier + ESLint recommended)  
+- Keep PRs small and focused  
+- Add clear, meaningful commit messages  
+- Document your changes where necessary  
+
+
 ## ❤️ Made with Blood, Sweat & Code by Harsh
