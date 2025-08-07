@@ -15,19 +15,17 @@ const BloodPreloader = ({ onFinish }) => {
     "RaktFlow is connecting the unseen...",
   ];
 
-  // Realistic blood viscosity simulation
   const bloodVariants = {
     initial: { scaleY: 0, originY: 0 },
     flowing: {
       scaleY: 1,
       transition: {
         duration: 3.5,
-        ease: [0.16, 0.77, 0.47, 0.97], // Custom easing for viscous flow
+        ease: [0.16, 0.77, 0.47, 0.97],
       },
     },
   };
 
-  // Blood drip effects
   const dripVariants = {
     falling: (i) => ({
       y: ["0%", "100%"],
@@ -47,15 +45,12 @@ const BloodPreloader = ({ onFinish }) => {
   };
 
   useEffect(() => {
-    // Start blood flow
     controls.start("flowing");
 
-    // Progress simulation
     const interval = setInterval(() => {
       setProgress((prev) => {
         if (prev >= 100) {
           clearInterval(interval);
-          // Final animation before exiting
           setTimeout(() => {
             textControls.start({
               opacity: 0,
@@ -69,7 +64,6 @@ const BloodPreloader = ({ onFinish }) => {
       });
     }, 30);
 
-    // Text reveal sequence
     const sequence = async () => {
       await textControls.start({ opacity: 1, y: 0 }, { delay: 0.1 });
       await textControls.start({
@@ -82,7 +76,6 @@ const BloodPreloader = ({ onFinish }) => {
     return () => clearInterval(interval);
   }, [controls, textControls, onFinish]);
 
-  // Change prompt based on progress
   useEffect(() => {
     const promptInterval = setInterval(() => {
       setCurrentPromptIndex((prev) => (prev + 1) % prompts.length);
@@ -93,10 +86,8 @@ const BloodPreloader = ({ onFinish }) => {
 
   return (
     <div className="fixed inset-0 bg-black z-50 overflow-hidden">
-      {/* Dark background with subtle texture */}
       <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iNSIgaGVpZ2h0PSI1IiBmaWxsPSIjMDAwMDAwIj48L3JlY3Q+CjxwYXRoIGQ9Ik0wIDVMNSAwWk02IDRMNCA2Wk0tMSAxTDEgLTFaIiBzdHJva2U9IiMxMDAwMDAiIHN0cm9rZS13aWR0aD0iMSI+PC9wYXRoPgo8L3N2Zz4=')] opacity-20" />
 
-      {/* Main blood flow */}
       <motion.div
         className="absolute top-0 left-0 w-full h-full origin-top"
         variants={bloodVariants}
@@ -111,7 +102,6 @@ const BloodPreloader = ({ onFinish }) => {
           filter: "blur(0.5px)",
         }}
       >
-        {/* Blood viscosity streaks */}
         <div className="absolute inset-0 overflow-hidden">
           {[...Array(8)].map((_, i) => (
             <motion.div
@@ -136,7 +126,6 @@ const BloodPreloader = ({ onFinish }) => {
         </div>
       </motion.div>
 
-      {/* Blood drips */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         {[...Array(15)].map((_, i) => (
           <React.Fragment key={i}>
@@ -163,7 +152,6 @@ const BloodPreloader = ({ onFinish }) => {
         ))}
       </div>
 
-      {/* Pulsing veins overlay */}
       <motion.div
         className="absolute inset-0 opacity-30"
         style={{
@@ -179,7 +167,6 @@ const BloodPreloader = ({ onFinish }) => {
         }}
       />
 
-      {/* RaktFlow text with creepy reveal */}
       <motion.div
         className="absolute inset-0 flex items-center justify-center"
         initial={{ opacity: 0, y: 20 }}
@@ -223,7 +210,6 @@ const BloodPreloader = ({ onFinish }) => {
             </h1>
           </motion.div>
 
-          {/* Rotating prompt text */}
           <motion.div
             className="mt-4 text-xl text-red-300 max-w-md mx-auto h-10"
             initial={{ opacity: 0 }}
@@ -246,7 +232,6 @@ const BloodPreloader = ({ onFinish }) => {
             ))}
           </motion.div>
 
-          {/* Progress bar with heartbeat pulse */}
           <motion.div
             className="mt-8 h-2 bg-gray-800 rounded-full overflow-hidden max-w-md mx-auto"
             initial={{ opacity: 0 }}
@@ -266,7 +251,6 @@ const BloodPreloader = ({ onFinish }) => {
         </div>
       </motion.div>
 
-      {/* Large percent counter in bottom right corner */}
       <motion.div
         className="absolute bottom-8 right-8 text-red-500 z-10"
         initial={{ opacity: 0 }}
@@ -276,7 +260,6 @@ const BloodPreloader = ({ onFinish }) => {
         <div className="text-6xl font-bold">{progress}%</div>
       </motion.div>
 
-      {/* Subtle screen flicker for horror effect */}
       <motion.div
         className="absolute inset-0 bg-white pointer-events-none"
         initial={{ opacity: 0 }}
