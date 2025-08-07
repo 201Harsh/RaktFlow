@@ -589,8 +589,8 @@ const RaktFlowChat = () => {
             </div>
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto bg-[url(./assets/img/bg22.jpg)] bg-cover bg-no-repeat bg-center">
-              <div className="min-h-full w-full px-2 sm:px-4 pt-16 pb-24 backdrop-blur-sm bg-gray-950/30">
+            <div className="flex-1 overflow-y-auto bg-[url(./assets/img/bg1.jpg)] bg-cover bg-no-repeat bg-center">
+              <div className="min-h-full w-full px-2 sm:px-4 pt-16 pb-24 backdrop-blur-xs bg-gray-950/10">
                 {currentMessages.length === 0 ? (
                   <div className="h-full flex flex-col items-center justify-center text-center text-gray-300 p-4">
                     <div className="backdrop-blur-xl bg-gray-900/80 p-6 rounded-xl border border-red-900/30 max-w-md">
@@ -619,8 +619,8 @@ const RaktFlowChat = () => {
                           <div
                             className={`max-w-[85%] sm:max-w-[75%] md:max-w-[65%] rounded-lg px-3 py-2 ${
                               msg.sender === "me"
-                                ? "bg-red-600/90 border border-red-700/50 rounded-tr-none"
-                                : "bg-gray-800/90 border border-gray-700/50 rounded-tl-none"
+                                ? "bg-red-800 border border-red-700/50 rounded-tr-none"
+                                : "bg-gray-800 border border-gray-700/50 rounded-tl-none"
                             }`}
                           >
                             {msg.image ? (
@@ -718,7 +718,7 @@ const RaktFlowChat = () => {
             </div>
           </>
         ) : (
-          <div className="bg-[url(./assets/img/bg23.jpg)] bg-cover bg-no-repeat bg-center h-full">
+          <div className="bg-[url(./assets/img/bg18.jpg)] bg-cover bg-no-repeat bg-center h-full">
             <div className="h-full w-full backdrop-blur-lg bg-gray-950/40 flex flex-col items-center justify-center text-center">
               <div className="mb-6">
                 <h1 className="text-4xl font-bold text-red-500 mb-2">
