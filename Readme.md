@@ -260,25 +260,6 @@ A glance at what's built, what's brewing, and what's coming soon:
 ---
 
 
-## 📃 License
-
-```text
-MIT License
-Copyright (c) 2025 Harsh
-Permission is hereby granted, free of charge, to any person obtaining a copy...
-```
-
----
-
-## 📮 Contact
-
-- GitHub: https://github.com/201Harsh
-- Instagram: https://www.instagram.com/201harshs/
-- Email: support@endgamingai2@gmail.com
-
----
-
-
 # 🤝 Contributing to RaktFlow
 
 We welcome all contributions to make **RaktFlow** even better! Whether you're fixing bugs, improving the UI, enhancing chatbot logic, or adding new features — your help is valued and appreciated.
@@ -334,6 +315,24 @@ git push origin feature/YourFeatureName
 - Keep PRs small and focused  
 - Add clear, meaningful commit messages  
 - Document your changes where necessary  
+
+---
+
+## 📃 License
+
+```text
+MIT License
+Copyright (c) 2025 Harsh
+Permission is hereby granted, free of charge, to any person obtaining a copy...
+```
+
+---
+
+## 📮 Contact
+
+- GitHub: https://github.com/201Harsh
+- Instagram: https://www.instagram.com/201harshs/
+- Email: support@endgamingai2@gmail.com
 
 ---
 
