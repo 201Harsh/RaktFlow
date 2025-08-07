@@ -82,18 +82,6 @@ const Register = () => {
       setIsSubmitting(false);
       setIsVerified(false);
     }
-
-    // Simulate verification process
-    // await new Promise((resolve) => setTimeout(resolve, 2000));
-
-    // setIsVerified(true);
-
-    // // Simulate successful registration
-    // setTimeout(() => {
-    //   setIsSubmitting(false);
-    //   setIsVerified(false);
-    //   // Handle actual registration logic here
-    // }, 1000);
   };
 
   return (
