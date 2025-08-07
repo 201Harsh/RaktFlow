@@ -257,5 +257,6 @@ git push origin feature/YourFeatureName
 - Add clear, meaningful commit messages  
 - Document your changes where necessary  
 
+---
 
 ## ❤️ Made with Blood, Sweat & Code by Harsh
