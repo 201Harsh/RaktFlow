@@ -18,8 +18,29 @@ const io = new Server(server, {
 
 // Store active rooms and their participants
 const activeRooms = {};
+// Store online users
+const onlineUsers = new Set();
 
 io.on("connection", (socket) => {
+  // Handle user going online
+  socket.on("userOnline", (userId) => {
+    if (userId) {
+      onlineUsers.add(userId);
+      // Notify all clients about this user's online status
+      io.emit("userStatusChanged", { userId, isOnline: true });
+      // Send the current online users list to the newly connected user
+      socket.emit("onlineUsersList", Array.from(onlineUsers));
+    }
+  });
+
+  // Handle user going offline
+  socket.on("userOffline", (userId) => {
+    if (userId) {
+      onlineUsers.delete(userId);
+      // Notify all clients about this user's offline status
+      io.emit("userStatusChanged", { userId, isOnline: false });
+    }
+  });
 
   // Handle joining a room (private chat between two users)
   socket.on("joinRoom", (roomId) => {
@@ -66,16 +87,15 @@ io.on("connection", (socket) => {
         time: new Date().toISOString(),
       };
 
-      
       // Send to all in the room (both sender and receiver)
       io.to(roomId).emit("receiveMessage", message);
     } catch (error) {
+      console.error("Error handling message:", error);
     }
   });
 
   // Handle disconnection
   socket.on("disconnect", () => {
-    
     // Clean up room participation
     for (const roomId in activeRooms) {
       if (activeRooms[roomId].has(socket.id)) {

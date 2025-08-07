@@ -30,28 +30,24 @@ const RaktFlowChat = () => {
   const [peoples, setPeoples] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
   const [showFollowPopup, setShowFollowPopup] = useState(false);
+  const [onlineUsers, setOnlineUsers] = useState([]);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
 
   const Navigate = useNavigate();
 
   useEffect(() => {
-    // Check if the popup has been shown before
     const hasSeenPopup = localStorage.getItem("hasSeenFollowPopup");
-
     if (!hasSeenPopup) {
-      // Show popup after a short delay (e.g., 3 seconds after page loads)
       const timer = setTimeout(() => {
         setShowFollowPopup(true);
       }, 400);
-
       return () => clearTimeout(timer);
     }
   }, []);
 
   const closeFollowPopup = () => {
     setShowFollowPopup(false);
-    // Store in localStorage that the user has seen the popup
     localStorage.setItem("hasSeenFollowPopup", "true");
   };
 
@@ -62,20 +58,45 @@ const RaktFlowChat = () => {
         const res = await AxiosInstance.get("/users/profile");
         if (res.status === 200) {
           setCurrentUser(res.data.user);
+          // Emit user online event after getting current user
+          socket.emit("userOnline", res.data.user._id);
         }
       } catch (error) {
         console.error("Failed to fetch current user", error);
       }
     };
     fetchCurrentUser();
+
+    return () => {
+      // Emit user offline event when component unmounts
+      if (currentUser?._id) {
+        socket.emit("userOffline", currentUser._id);
+      }
+    };
   }, []);
 
-  // Socket.IO message handling
+  // Socket.IO connection and event handlers
   useEffect(() => {
     if (!currentUser) return;
 
+    // Online/offline status updates
+    socket.on("userStatusChanged", ({ userId, isOnline }) => {
+      setOnlineUsers(prev => {
+        if (isOnline) {
+          return [...new Set([...prev, userId])];
+        } else {
+          return prev.filter(id => id !== userId);
+        }
+      });
+    });
+
+    // Initial online users list
+    socket.on("onlineUsersList", (users) => {
+      setOnlineUsers(users);
+    });
+
+    // Message handling
     const handleReceiveMessage = (msg) => {
-      // Only add message if it's for the current chat
       if (
         selectedUser &&
         ((msg.senderId === selectedUser._id &&
@@ -97,12 +118,9 @@ const RaktFlowChat = () => {
 
         setChatHistories((prev) => {
           const existingMessages = prev[selectedUser._id] || [];
-
-          // Check if message already exists to prevent duplicates
           if (existingMessages.some((m) => m.id === newMessage.id)) {
             return prev;
           }
-
           return {
             ...prev,
             [selectedUser._id]: [...existingMessages, newMessage],
@@ -113,9 +131,10 @@ const RaktFlowChat = () => {
 
     socket.on("receiveMessage", handleReceiveMessage);
 
-    // Cleanup listener on unmount
     return () => {
       socket.off("receiveMessage", handleReceiveMessage);
+      socket.off("userStatusChanged");
+      socket.off("onlineUsersList");
     };
   }, [selectedUser, currentUser]);
 
@@ -149,7 +168,6 @@ const RaktFlowChat = () => {
       try {
         const res = await AxiosInstance.get("/users/all");
         if (res.status === 200) {
-          // Filter out the current user from the people list
           const filteredUsers = res.data.users.filter(
             (user) => user._id !== currentUser?._id
           );
@@ -193,7 +211,6 @@ const RaktFlowChat = () => {
     },
   ];
 
-  // Filter contacts
   const filteredPeople = peoples.filter((person) =>
     person.username.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -216,7 +233,6 @@ const RaktFlowChat = () => {
       time: new Date().toISOString(),
     };
 
-    // Optimistically update UI
     const uiMessage = {
       id: newMessage.id,
       text: newMessage.text,
@@ -234,10 +250,8 @@ const RaktFlowChat = () => {
     }));
 
     socket.emit("sendMessage", newMessage);
-
     setMessage("");
 
-    // Auto-scroll to bottom
     setTimeout(() => {
       messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, 100);
@@ -262,7 +276,6 @@ const RaktFlowChat = () => {
         time: new Date().toISOString(),
       };
 
-      // Optimistically update UI
       const uiMessage = {
         id: newMessage.id,
         image: newMessage.image,
@@ -279,13 +292,11 @@ const RaktFlowChat = () => {
         [selectedUser._id]: [...(prev[selectedUser._id] || []), uiMessage],
       }));
 
-      // Send message via socket
       socket.emit("sendMessage", {
         ...newMessage,
         text: "Image shared",
       });
 
-      // Auto-scroll to bottom
       setTimeout(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
       }, 100);
@@ -324,6 +335,11 @@ const RaktFlowChat = () => {
       });
 
       if (response.status === 200) {
+        // Emit offline event before logging out
+        if (currentUser?._id) {
+          socket.emit("userOffline", currentUser._id);
+        }
+        
         localStorage.clear();
         socket.disconnect();
         toast.success(response.data.message, {
@@ -353,10 +369,13 @@ const RaktFlowChat = () => {
     ? chatHistories[selectedUser._id || selectedUser.id] || []
     : [];
 
-  // Auto-scroll to bottom when messages change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [currentMessages]);
+
+  const isUserOnline = (userId) => {
+    return onlineUsers.includes(userId);
+  };
 
   return (
     <div className="flex h-screen bg-gray-950 text-gray-200 overflow-hidden">
@@ -458,6 +477,9 @@ const RaktFlowChat = () => {
                         {person.username.charAt(0).toUpperCase()}
                       </span>
                     </div>
+                    {isUserOnline(person._id) && (
+                      <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-gray-900"></div>
+                    )}
                   </div>
                   <div className="ml-3 flex-1 min-w-0">
                     <div className="flex justify-between items-center">
@@ -466,7 +488,7 @@ const RaktFlowChat = () => {
                       </h3>
                     </div>
                     <p className="text-sm text-gray-400 truncate">
-                      Start chatting with {person.username}
+                      {isUserOnline(person._id) ? "Online" : "Offline"}
                     </p>
                   </div>
                 </motion.div>
@@ -487,8 +509,11 @@ const RaktFlowChat = () => {
                 }`}
                 onClick={() => handleUserSelect(bot)}
               >
-                <div className="w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center">
-                  <BsRobot className="text-2xl text-red-500" />
+                <div className="relative">
+                  <div className="w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center">
+                    <BsRobot className="text-2xl text-red-500" />
+                  </div>
+                  <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-gray-900"></div>
                 </div>
                 <div className="ml-3 flex-1 min-w-0">
                   <div className="flex justify-between items-center">
@@ -513,10 +538,13 @@ const RaktFlowChat = () => {
         {/* Current User Profile */}
         {currentUser && (
           <div className="p-3 border-t border-gray-800 flex items-center">
-            <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center">
-              <span className="text-lg text-red-500">
-                {currentUser.username?.charAt(0).toUpperCase()}
-              </span>
+            <div className="relative">
+              <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center">
+                <span className="text-lg text-red-500">
+                  {currentUser.username?.charAt(0).toUpperCase()}
+                </span>
+              </div>
+              <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-gray-900"></div>
             </div>
             <div className="ml-3 flex-1 min-w-0">
               <h3 className="font-medium truncate">{currentUser.username}</h3>
@@ -552,29 +580,38 @@ const RaktFlowChat = () => {
                     <FaChevronLeft className="text-xl" />
                   </button>
                 )}
-                {selectedUser.avatar ? (
-                  <img
-                    src={selectedUser.avatar}
-                    alt={selectedUser.username || selectedUser.name}
-                    className="w-10 h-10 rounded-full object-cover"
-                  />
-                ) : (
-                  <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center">
-                    {selectedUser.isBot ? (
-                      <BsRobot className="text-xl text-red-500" />
-                    ) : (
-                      <span className="text-lg text-red-500">
-                        {selectedUser.username?.charAt(0).toUpperCase()}
-                      </span>
-                    )}
-                  </div>
-                )}
+                <div className="relative">
+                  {selectedUser.avatar ? (
+                    <img
+                      src={selectedUser.avatar}
+                      alt={selectedUser.username || selectedUser.name}
+                      className="w-10 h-10 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center">
+                      {selectedUser.isBot ? (
+                        <BsRobot className="text-xl text-red-500" />
+                      ) : (
+                        <span className="text-lg text-red-500">
+                          {selectedUser.username?.charAt(0).toUpperCase()}
+                        </span>
+                      )}
+                    </div>
+                  )}
+                  {!selectedUser.isBot && isUserOnline(selectedUser._id) && (
+                    <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-gray-900"></div>
+                  )}
+                </div>
                 <div className="ml-3">
                   <h3 className="font-medium">
                     {selectedUser.username || selectedUser.name}
                   </h3>
                   <p className="text-xs text-green-400">
-                    {selectedUser.isBot ? "AI Assistant" : "Online"}
+                    {selectedUser.isBot
+                      ? "AI Assistant"
+                      : isUserOnline(selectedUser._id)
+                      ? "Online"
+                      : "Offline"}
                   </p>
                 </div>
               </div>
