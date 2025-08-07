@@ -25,7 +25,9 @@ const RaktFlowChatProtector = ({ children }) => {
         });
 
         if (res.status === 200) {
-          setIsLoading(false);
+          setTimeout(() => {
+            setIsLoading(false);
+          }, 3500);
         } else {
           localStorage.clear();
           toast.error("Unauthorized", {
@@ -33,7 +35,7 @@ const RaktFlowChatProtector = ({ children }) => {
             autoClose: 5000,
             theme: "dark",
             transition: Bounce,
-          })
+          });
           navigate("/");
         }
       } catch (error) {
@@ -53,7 +55,11 @@ const RaktFlowChatProtector = ({ children }) => {
   }, [navigate]);
 
   if (isLoading) {
-    return <BloodPreloader />;
+    return (
+      <>
+        <BloodPreloader />
+      </>
+    );
   }
 
   return <>{children}</>;
