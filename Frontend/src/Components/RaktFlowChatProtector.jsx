@@ -11,7 +11,6 @@ const RaktFlowChatProtector = ({ children }) => {
   useEffect(() => {
     const token = localStorage.getItem("token");
 
-    // Redirect early if token not found
     if (!token) {
       navigate("/");
       return;
