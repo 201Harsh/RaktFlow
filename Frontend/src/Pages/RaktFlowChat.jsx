@@ -718,23 +718,27 @@ const RaktFlowChat = () => {
             </div>
           </>
         ) : (
-          <div className="h-full flex flex-col items-center justify-center p-6 text-center">
-            <div className="mb-6">
-              <h1 className="text-4xl font-bold text-red-500 mb-2">RaktFlow</h1>
-              <p className="text-gray-200">Real-time chat application</p>
+          <div className="bg-[url(./assets/img/bg23.jpg)] bg-cover bg-no-repeat bg-center h-full">
+            <div className="h-full w-full backdrop-blur-lg bg-gray-950/40 flex flex-col items-center justify-center text-center">
+              <div className="mb-6">
+                <h1 className="text-4xl font-bold text-red-500 mb-2">
+                  RaktFlow
+                </h1>
+                <p className="text-gray-200">Real-time chat application</p>
+              </div>
+              <div className="max-w-md w-full px-4">
+                <img
+                  src="https://illustrations.popsy.co/red/video-call.svg"
+                  alt="Chat Illustration"
+                  className="w-full h-auto"
+                />
+              </div>
+              <p className="mt-6 text-gray-200 max-w-md px-4">
+                {activeTab === "people"
+                  ? "Select a person to start chatting"
+                  : "Select an AI bot to get assistance"}
+              </p>
             </div>
-            <div className="max-w-md w-full px-4">
-              <img
-                src="https://illustrations.popsy.co/red/video-call.svg"
-                alt="Chat Illustration"
-                className="w-full h-auto"
-              />
-            </div>
-            <p className="mt-6 text-gray-500 max-w-md px-4">
-              {activeTab === "people"
-                ? "Select a person to start chatting"
-                : "Select an AI bot to get assistance"}
-            </p>
           </div>
         )}
       </div>
