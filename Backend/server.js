@@ -8,6 +8,7 @@ const { Server } = require("socket.io");
 const server = http.createServer(app);
 
 const io = new Server(server, {
+  maxHttpBufferSize: 1e7, // 10MB
   cors: {
     origin: process.env.CLIENT_URL,
     methods: ["GET", "POST"],
