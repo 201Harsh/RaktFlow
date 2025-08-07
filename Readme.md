@@ -3,7 +3,7 @@
 
 ![RaktFlow Banner](https://img.shields.io/badge/RaktFlow-Secure_1v1_Chat_App-darkred?style=for-the-badge&logo=chat&logoColor=white&color=7B1E1E&labelColor=000000)
 
-RaktFlow is a secure, real-time SaaS chat platform designed for private 1v1 conversations — fast, encrypted, and minimal. Featuring seamless login, intelligent user discovery, and an integrated AI chatbot system powered by EndGaming AI, RaktFlow offers users a unique blend of privacy, speed, and smart interaction. Whether you're chatting with friends or engaging in deep conversations with bots, your messages stay yours — always private, always flowing.
+**RaktFlow** is a secure, real-time SaaS chat platform designed for private 1v1 conversations — fast, encrypted, and minimal. Featuring seamless login, intelligent user discovery, and an integrated AI chatbot system powered by **EndGaming AI API** , RaktFlow offers users a unique blend of privacy, speed, and smart interaction. Whether you're chatting with friends or engaging in deep conversations with bots, your messages stay yours — always private, always flowing.
 
 [![React](https://img.shields.io/badge/React-18.2.0-blue)](https://reactjs.org)
 [![Node.js](https://img.shields.io/badge/Node-18.16.0-green)](https://nodejs.org)
@@ -133,7 +133,7 @@ npm run dev
 
 ## 🖼 Screenshots
 
-> Add actual screenshots in the /screenshots directory
+> No Screenshots Available Now.
 
 ---
 
@@ -151,36 +151,114 @@ npm run dev
 
 ---
 
-## 🤖 AI Bot Example
 
-```js
-// backend/routes/ai.js
-const axios = require("axios");
+# 🤖 AI Bot Integration (EndGaming AI)
 
-router.post("/bot-reply", async (req, res) => {
-  const { prompt } = req.body;
+This guide shows how to integrate the **EndGaming AI API** with your RaktFlow backend to enable real-time AI-powered chatbot interactions.
 
-  const response = await axios.post("https://generative-api.example.com/chat", {
-    prompt,
-    apiKey: process.env.AI_KEY,
-  });
+---
 
-  res.json({ reply: response.data.message });
-});
+## 📦 Setup
+
+Ensure you have the following dependencies installed in your backend project:
+
+```bash
+npm install express axios dotenv
 ```
 
 ---
 
-## 🛣 Roadmap
+## 🔐 Environment Variable
 
-- ✅ Chat UI Cleanup
-- ✅ User Search & AI Tabs
-- 🔐 End-to-End Encryption
-- 📂 Chat History Storage (not available)
-- ✅ Chatbot Integration
-- 🌐 Typing & Online Status (not available)
+Create or update your `.env` file with your EndGaming AI API key:
+
+```env
+ENDGAMING_AI_KEY=your_actual_api_key_here
+```
 
 ---
+
+## 🚀 Example Route
+
+Here's a sample route for handling AI-powered replies using **EndGaming AI API**:
+
+```js
+// backend/routes/ai.js
+const express = require("express");
+const router = express.Router();
+const axios = require("axios");
+
+router.post("/bot-reply", async (req, res) => {
+  try {
+    const { prompt } = req.body;
+
+    const response = await axios.post(
+      "https://api.endgamingai.com/v1/chat",
+      {
+        prompt,
+        model: "endgaming-gpt",
+        temperature: 0.7,
+        maxTokens: 150,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.ENDGAMING_AI_KEY}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    res.json({ reply: response.data.reply });
+  } catch (error) {
+    console.error("AI Bot Error:", error.message);
+    res.status(500).json({ error: "Failed to get AI response" });
+  }
+});
+
+module.exports = router;
+```
+
+---
+
+## 💡 Notes
+
+- You can adjust `temperature`, `model`, or `maxTokens` for different response behavior.
+- Consider adding rate limiting and fallback responses in case of failure.
+
+Enjoy building smarter chatbots with **EndGaming AI**!
+
+---
+
+
+## 🛣 Roadmap
+
+A glance at what's built, what's brewing, and what's coming soon:
+
+---
+
+### ✅ Completed
+
+- ✅ **Chat UI Cleanup** – Minimal, sleek interface for better usability  
+- ✅ **User Search & AI Tabs** – Switch between human chats and bots seamlessly  
+- ✅ **Chatbot Integration (Basic)** – Initial integration with EndGaming AI API  
+
+---
+
+### 🚧 In Progress / Planned
+
+- 🔐 **End-to-End Encryption** – Ensure full message privacy with E2EE protocols  
+- 📂 **Chat History Storage** – Save and retrieve past conversations  
+- 🌐 **Typing Indicators & Online Status** – Real-time awareness of user activity  
+- 📎 **File & Media Sharing** – Allow images, PDFs, and more in chats  
+- 🔔 **Notifications** – Browser and in-app message alerts  
+- 🧠 **Advanced AI Bot Features** – Contextual memory, personalized replies  
+- 🌍 **Internationalization (i18n)** – Support for multiple languages  
+- 📱 **Mobile Optimization** – Fully responsive mobile experience  
+- 📊 **Admin Dashboard** – Manage users, bots, and conversations  
+- 🧪 **Unit & Integration Tests** – Robust testing coverage for stability  
+
+---
+
 
 ## 📃 License
 
