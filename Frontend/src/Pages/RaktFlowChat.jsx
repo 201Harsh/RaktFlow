@@ -624,8 +624,8 @@ const RaktFlowChat = () => {
             </div>
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto bg-[url(./assets/img/bg22.jpg)] bg-cover bg-no-repeat bg-center">
-              <div className="min-h-full w-full px-2 sm:px-4 pt-16 pb-24 backdrop-blur-xs bg-gray-950/50">
+            <div className="flex-1 h-screen overflow-y-auto bg-[url(https://videos.openai.com/vg-assets/assets%2Ftask_01jxg1pv4ef8h98e1q2tfbbp92%2F1749664153_img_1.webp?st=2025-08-08T04%3A59%3A26Z&se=2025-08-14T05%3A59%3A26Z&sks=b&skt=2025-08-08T04%3A59%3A26Z&ske=2025-08-14T05%3A59%3A26Z&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skoid=3d249c53-07fa-4ba4-9b65-0bf8eb4ea46a&skv=2019-02-02&sv=2018-11-09&sr=b&sp=r&spr=https%2Chttp&sig=Igi4W81icUO1mTpQ9ryAVv45iqtF3l%2FF0SHooONp0M0%3D&az=oaivgprodscus)] md:bg-[url(./assets/img/bg1.jpg)] bg-cover bg-no-repeat bg-center">
+              <div className="min-h-full w-full px-2 sm:px-4 pt-20 pb-24 backdrop-blur-xs md:backdrop-blur-xs bg-gray-500/10">
                 {currentMessages.length === 0 ? (
                   <div className="h-full flex flex-col items-center justify-center text-center text-gray-300 p-4">
                     <div className="backdrop-blur-xl bg-gray-900/80 p-6 rounded-xl border border-red-900/30 max-w-md">
