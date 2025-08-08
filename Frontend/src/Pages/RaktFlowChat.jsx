@@ -495,7 +495,7 @@ const RaktFlowChat = () => {
               ))
             ) : (
               <div className="p-4 text-center text-gray-500">
-                No matching people found
+                No User found
               </div>
             )
           ) : filteredBots.length > 0 ? (
