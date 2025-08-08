@@ -81,11 +81,11 @@ const RaktFlowChat = () => {
 
     // Online/offline status updates
     socket.on("userStatusChanged", ({ userId, isOnline }) => {
-      setOnlineUsers(prev => {
+      setOnlineUsers((prev) => {
         if (isOnline) {
           return [...new Set([...prev, userId])];
         } else {
-          return prev.filter(id => id !== userId);
+          return prev.filter((id) => id !== userId);
         }
       });
     });
@@ -339,7 +339,7 @@ const RaktFlowChat = () => {
         if (currentUser?._id) {
           socket.emit("userOffline", currentUser._id);
         }
-        
+
         localStorage.clear();
         socket.disconnect();
         toast.success(response.data.message, {
@@ -494,9 +494,7 @@ const RaktFlowChat = () => {
                 </motion.div>
               ))
             ) : (
-              <div className="p-4 text-center text-gray-500">
-                No User found
-              </div>
+              <div className="p-4 text-center text-gray-500">No User found</div>
             )
           ) : filteredBots.length > 0 ? (
             filteredBots.map((bot) => (
