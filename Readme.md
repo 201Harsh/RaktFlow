@@ -1,4 +1,3 @@
-
 # 🩸 RaktFlow - Private Realtime 1v1 Chat App [![MIT License](https://img.shields.io/badge/License-MIT-red.svg)](https://choosealicense.com/licenses/mit/)
 
 ![RaktFlow Banner](https://img.shields.io/badge/RaktFlow-Secure_1v1_Chat_App-darkred?style=for-the-badge&logo=chat&logoColor=white&color=7B1E1E&labelColor=000000)
@@ -30,15 +29,15 @@
 
 ## ✨ Features
 
-| Feature                | Description                                                             |
-|------------------------|-------------------------------------------------------------------------|
-| 🔐 **Authentication**  | Unique username and password registration & secure login/logout system |
+| Feature                 | Description                                                            |
+| ----------------------- | ---------------------------------------------------------------------- |
+| 🔐 **Authentication**   | Unique username and password registration & secure login/logout system |
 | 👥 **User List**        | View all existing users on the platform                                |
 | 🔎 **Search Users**     | Easily search users by username                                        |
 | 🤖 **AI Bots Tab**      | Chat with AI-powered bots in a separate section                        |
-| 💬 **1v1 Private Chat** | True private messaging with no third-party visibility                 |
+| 💬 **1v1 Private Chat** | True private messaging with no third-party visibility                  |
 | 🔁 **Persistent Login** | Re-login anytime with your registered credentials                      |
-| 🔓 **Logout Anytime**   | Easily logout and return to login screen                              |
+| 🔓 **Logout Anytime**   | Easily logout and return to login screen                               |
 
 ---
 
@@ -133,24 +132,40 @@ npm run dev
 
 ## 🖼 Screenshots
 
-> No Screenshots Available Now.
+> See the Screenshots Below
+
+### Register and Login Page
+
+<img src="./github_readme/ss1.png"/>
+
+<img src="./github_readme/ss2.png"/>
+
+### Chat Page
+
+<img src="./github_readme/ss3.png"/>
+
+<img src="./github_readme/ss4.png"/>
+
+
 
 ---
 
 ## 🚀 Deployment
 
 **Render:**
+
 - Backend: Deploy Express server and MongoDB URI in environment variables
 - Frontend: Build with `npm run build` and serve using static hosting
 
 **Vercel:**
+
 - Frontend only (connect to backend API via HTTPS)
 
-**MongoDB Atlas:** 
+**MongoDB Atlas:**
+
 - Use cloud database connection string
 
 ---
-
 
 # 🤖 AI Bot Integration (EndGaming AI)
 
@@ -229,7 +244,6 @@ Enjoy building smarter chatbots with **EndGaming AI**!
 
 ---
 
-
 ## 🛣 Roadmap
 
 A glance at what's built, what's brewing, and what's coming soon:
@@ -238,27 +252,26 @@ A glance at what's built, what's brewing, and what's coming soon:
 
 ### ✅ Completed
 
-- ✅ **Chat UI Cleanup** – Minimal, sleek interface for better usability  
-- ✅ **User Search & AI Tabs** – Switch between human chats and bots seamlessly  
-- ✅ **Chatbot Integration (Basic)** – Initial integration with EndGaming AI API  
+- ✅ **Chat UI Cleanup** – Minimal, sleek interface for better usability
+- ✅ **User Search & AI Tabs** – Switch between human chats and bots seamlessly
+- ✅ **Chatbot Integration (Basic)** – Initial integration with EndGaming AI API
 
 ---
 
 ### 🚧 In Progress / Planned
 
-- 🔐 **End-to-End Encryption** – Ensure full message privacy with E2EE protocols  
-- 📂 **Chat History Storage** – Save and retrieve past conversations  
-- 🌐 **Typing Indicators & Online Status** – Real-time awareness of user activity  
-- 📎 **File & Media Sharing** – Allow images, PDFs, and more in chats  
-- 🔔 **Notifications** – Browser and in-app message alerts  
-- 🧠 **Advanced AI Bot Features** – Contextual memory, personalized replies  
-- 🌍 **Internationalization (i18n)** – Support for multiple languages  
-- 📱 **Mobile Optimization** – Fully responsive mobile experience  
-- 📊 **Admin Dashboard** – Manage users, bots, and conversations  
-- 🧪 **Unit & Integration Tests** – Robust testing coverage for stability  
+- 🔐 **End-to-End Encryption** – Ensure full message privacy with E2EE protocols
+- 📂 **Chat History Storage** – Save and retrieve past conversations
+- 🌐 **Typing Indicators & Online Status** – Real-time awareness of user activity
+- 📎 **File & Media Sharing** – Allow images, PDFs, and more in chats
+- 🔔 **Notifications** – Browser and in-app message alerts
+- 🧠 **Advanced AI Bot Features** – Contextual memory, personalized replies
+- 🌍 **Internationalization (i18n)** – Support for multiple languages
+- 📱 **Mobile Optimization** – Fully responsive mobile experience
+- 📊 **Admin Dashboard** – Manage users, bots, and conversations
+- 🧪 **Unit & Integration Tests** – Robust testing coverage for stability
 
 ---
-
 
 # 🤝 Contributing to RaktFlow
 
@@ -268,7 +281,7 @@ We welcome all contributions to make **RaktFlow** even better! Whether you're fi
 
 ## 🛠 How to Contribute
 
-1. **Fork the repository**  
+1. **Fork the repository**
 2. **Clone your fork to your local machine**
 
 ```bash
@@ -301,20 +314,20 @@ git push origin feature/YourFeatureName
 
 - 🧱 Add support for emojis, images, or file sharing
 - 🔐 Implement more end-to-end encryption
-- 🤖 Improve AI bot responses using GPT/Gemini API  
-- 🧑‍🎨 Refactor or redesign UI components (Tailwind + Plan CSS)  
-- 💬 Add message read receipts or typing indicators 
-- 🌍 Add internationalization / localization support 
+- 🤖 Improve AI bot responses using GPT/Gemini API
+- 🧑‍🎨 Refactor or redesign UI components (Tailwind + Plan CSS)
+- 💬 Add message read receipts or typing indicators
+- 🌍 Add internationalization / localization support
 - 🌐 Add User's Online/Offline Feature
 
 ---
 
 ## 📜 Guidelines
 
-- Follow consistent code style (Prettier + ESLint recommended)  
-- Keep PRs small and focused  
-- Add clear, meaningful commit messages  
-- Document your changes where necessary  
+- Follow consistent code style (Prettier + ESLint recommended)
+- Keep PRs small and focused
+- Add clear, meaningful commit messages
+- Document your changes where necessary
 
 ---
 
