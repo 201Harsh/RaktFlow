@@ -754,91 +754,91 @@ const RaktFlowChat = () => {
           </>
         ) : (
           <div className="bg-[url(./assets/img/bg18.jpg)] bg-cover bg-no-repeat bg-center h-full overflow-hidden">
-  <div className="h-full w-full backdrop-blur-lg bg-gray-950/40 flex flex-col items-center justify-center text-center">
-    {/* Animated background elements */}
-    <div className="absolute inset-0 overflow-hidden">
-      <div className="absolute top-1/4 left-1/4 w-16 h-16 rounded-full bg-red-500/20 animate-pulse animate-float"></div>
-      <div className="absolute top-1/3 right-1/3 w-24 h-24 rounded-full bg-red-500/10 animate-pulse animate-float animation-delay-2000"></div>
-      <div className="absolute bottom-1/4 right-1/4 w-20 h-20 rounded-full bg-red-500/15 animate-pulse animate-float animation-delay-3000"></div>
-    </div>
+            <div className="h-full w-full backdrop-blur-lg bg-gray-950/40 flex flex-col items-center justify-center text-center">
+              {/* Animated background elements */}
+              <div className="absolute inset-0 overflow-hidden">
+                <div className="absolute top-1/4 left-1/4 w-16 h-16 rounded-full bg-red-500/20 animate-pulse animate-float"></div>
+                <div className="absolute top-1/3 right-1/3 w-24 h-24 rounded-full bg-red-500/10 animate-pulse animate-float animation-delay-2000"></div>
+                <div className="absolute bottom-1/4 right-1/4 w-20 h-20 rounded-full bg-red-500/15 animate-pulse animate-float animation-delay-3000"></div>
+              </div>
 
-    {/* Content with animations */}
-    <motion.div 
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.8 }}
-      className="mb-6 relative z-10"
-    >
-      <motion.h1 
-        className="text-4xl md:text-5xl font-bold text-red-500 mb-2"
-        whileHover={{ scale: 1.05 }}
-        transition={{ type: "spring", stiffness: 400, damping: 10 }}
-      >
-        RaktFlow
-      </motion.h1>
-      <motion.p 
-        className="text-gray-200"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.3, duration: 0.8 }}
-      >
-        Real-time chat application
-      </motion.p>
-    </motion.div>
+              {/* Content with animations */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8 }}
+                className="mb-6 relative z-10"
+              >
+                <motion.h1
+                  className="text-4xl md:text-5xl font-bold text-red-500 mb-2"
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                >
+                  RaktFlow
+                </motion.h1>
+                <motion.p
+                  className="text-gray-200"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.3, duration: 0.8 }}
+                >
+                  Real-time chat application
+                </motion.p>
+              </motion.div>
 
-    <motion.div 
-      className="max-w-md w-full px-4 relative z-10"
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ delay: 0.4, duration: 0.8 }}
-    >
-      <img
-        src="https://illustrations.popsy.co/red/video-call.svg"
-        alt="Chat Illustration"
-        className="w-full h-auto hover:scale-105 transition-transform duration-300"
-      />
-    </motion.div>
+              <motion.div
+                className="max-w-md w-full px-4 relative z-10"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.4, duration: 0.8 }}
+              >
+                <img
+                  src="https://illustrations.popsy.co/red/video-call.svg"
+                  alt="Chat Illustration"
+                  className="w-full h-auto hover:scale-105 transition-transform duration-300"
+                />
+              </motion.div>
 
-    <motion.p 
-      className="mt-6 text-gray-200 max-w-md px-4 relative z-10"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ delay: 0.6, duration: 0.8 }}
-      key={activeTab} // This will trigger animation when activeTab changes
-    >
-      {activeTab === "people"
-        ? "Select a person to start chatting"
-        : "Select an AI bot to get assistance"}
-    </motion.p>
+              <motion.p
+                className="mt-6 text-gray-200 max-w-md px-4 relative z-10"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.6, duration: 0.8 }}
+                key={activeTab} // This will trigger animation when activeTab changes
+              >
+                {activeTab === "people"
+                  ? "Select a person to start chatting"
+                  : "Select an AI bot to get assistance"}
+              </motion.p>
 
-    {/* Floating particles */}
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {[...Array(15)].map((_, i) => (
-        <motion.div
-          key={i}
-          className="absolute rounded-full bg-red-500/30"
-          style={{
-            width: Math.random() * 8 + 4 + 'px',
-            height: Math.random() * 8 + 4 + 'px',
-            top: Math.random() * 100 + '%',
-            left: Math.random() * 100 + '%',
-          }}
-          animate={{
-            y: [0, (Math.random() - 0.5) * 100],
-            x: [0, (Math.random() - 0.5) * 50],
-            opacity: [0.2, 0.8, 0.2],
-          }}
-          transition={{
-            duration: Math.random() * 10 + 10,
-            repeat: Infinity,
-            repeatType: 'reverse',
-            ease: 'easeInOut',
-          }}
-        />
-      ))}
-    </div>
-  </div>
-</div>
+              {/* Floating particles */}
+              <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                {[...Array(15)].map((_, i) => (
+                  <motion.div
+                    key={i}
+                    className="absolute rounded-full bg-red-500/30"
+                    style={{
+                      width: Math.random() * 8 + 4 + "px",
+                      height: Math.random() * 8 + 4 + "px",
+                      top: Math.random() * 100 + "%",
+                      left: Math.random() * 100 + "%",
+                    }}
+                    animate={{
+                      y: [0, (Math.random() - 0.5) * 100],
+                      x: [0, (Math.random() - 0.5) * 50],
+                      opacity: [0.2, 0.8, 0.2],
+                    }}
+                    transition={{
+                      duration: Math.random() * 10 + 10,
+                      repeat: Infinity,
+                      repeatType: "reverse",
+                      ease: "easeInOut",
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
         )}
       </div>
     </div>
